@@ -1,0 +1,362 @@
+@prefix rca:   <http://rca-sentinel.io/ontology#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix isa95: <http://www.isa-95.org/ontology#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+
+# =============================================================================
+# RCA-Sentinel Manufacturing Ontology (ISA-95 Aligned)
+# =============================================================================
+
+rca: a owl:Ontology ;
+    rdfs:label "RCA-Sentinel Manufacturing Ontology" ;
+    rdfs:comment "Knowledge graph ontology for root cause analysis in high-precision manufacturing. Aligned with ISA-95 hierarchy." ;
+    owl:versionInfo "1.0.0" .
+
+# =============================================================================
+# CLASSES — Manufacturing Hierarchy (ISA-95 Levels 0-4)
+# =============================================================================
+
+rca:Plant a owl:Class ;
+    rdfs:label "Plant" ;
+    rdfs:comment "Manufacturing plant / facility (ISA-95 Level 4)." ;
+    rdfs:subClassOf isa95:Enterprise .
+
+rca:Line a owl:Class ;
+    rdfs:label "Line" ;
+    rdfs:comment "Assembly or production line within a plant (ISA-95 Level 3)." ;
+    rdfs:subClassOf isa95:WorkCenter .
+
+rca:Machine a owl:Class ;
+    rdfs:label "Machine" ;
+    rdfs:comment "Machine or equipment on a production line (ISA-95 Level 2)." ;
+    rdfs:subClassOf isa95:Equipment .
+
+rca:Sensor a owl:Class ;
+    rdfs:label "Sensor" ;
+    rdfs:comment "Physical sensor attached to a machine." .
+
+rca:Tag a owl:Class ;
+    rdfs:label "Tag" ;
+    rdfs:comment "Process tag representing a named telemetry data point." .
+
+# ── Work and Production ─────────────────────────────────────────────
+
+rca:WorkOrder a owl:Class ;
+    rdfs:label "WorkOrder" ;
+    rdfs:comment "MES work order for a production run." ;
+    rdfs:subClassOf isa95:ProductionOrder .
+
+rca:Batch a owl:Class ;
+    rdfs:label "Batch" ;
+    rdfs:comment "Production batch within a work order." .
+
+rca:Product a owl:Class ;
+    rdfs:label "Product" ;
+    rdfs:comment "Product being manufactured." .
+
+# ── Personnel ───────────────────────────────────────────────────────
+
+rca:Operator a owl:Class ;
+    rdfs:label "Operator" ;
+    rdfs:comment "Production line operator." .
+
+rca:Shift a owl:Class ;
+    rdfs:label "Shift" ;
+    rdfs:comment "Defined shift period on a line." .
+
+rca:Crew a owl:Class ;
+    rdfs:label "Crew" ;
+    rdfs:comment "Maintenance or operations crew." .
+
+# ── Maintenance ─────────────────────────────────────────────────────
+
+rca:MaintenanceLog a owl:Class ;
+    rdfs:label "MaintenanceLog" ;
+    rdfs:comment "Record of a maintenance activity performed on a machine." .
+
+rca:CalibrationEvent a owl:Class ;
+    rdfs:label "CalibrationEvent" ;
+    rdfs:comment "Calibration event for a machine or sensor." .
+
+# ── Supply Chain ────────────────────────────────────────────────────
+
+rca:Supplier a owl:Class ;
+    rdfs:label "Supplier" ;
+    rdfs:comment "Supplier in the tiered supply chain." ;
+    skos:altLabel "Vendor" .  # Alias: ERP 'Supplier' == QMS 'Vendor'
+
+rca:MaterialLot a owl:Class ;
+    rdfs:label "MaterialLot" ;
+    rdfs:comment "Lot of material from a supplier with traceability." .
+
+rca:Component a owl:Class ;
+    rdfs:label "Component" ;
+    rdfs:comment "Component used in production, traced to a material lot." .
+
+rca:BOMItem a owl:Class ;
+    rdfs:label "BOMItem" ;
+    rdfs:comment "Bill of Materials item linking a product to its components." .
+
+# ── Quality and Failure Analysis ────────────────────────────────────
+
+rca:DefectCode a owl:Class ;
+    rdfs:label "DefectCode" ;
+    rdfs:comment "Standardized defect classification code." .
+
+rca:FailureMode a owl:Class ;
+    rdfs:label "FailureMode" ;
+    rdfs:comment "PFMEA failure mode with severity/occurrence/detection scores." .
+
+rca:Cause a owl:Class ;
+    rdfs:label "Cause" ;
+    rdfs:comment "Root cause category in the failure ontology." .
+
+rca:ControlPlan a owl:Class ;
+    rdfs:label "ControlPlan" ;
+    rdfs:comment "Quality control plan for a product." .
+
+# ── Incident and Decision Chain ─────────────────────────────────────
+
+rca:Incident a owl:Class ;
+    rdfs:label "Incident" ;
+    rdfs:comment "Detected anomaly incident triggering the RCA pipeline." .
+
+rca:DecisionObject a owl:Class ;
+    rdfs:label "DecisionObject" ;
+    rdfs:comment "First-class node in the RCA chain: Detect → Diagnose → Classify → Forecast → Remediate." .
+
+rca:EvidenceLink a owl:Class ;
+    rdfs:label "EvidenceLink" ;
+    rdfs:comment "Link from a decision to a piece of graph evidence." .
+
+rca:RemediationAction a owl:Class ;
+    rdfs:label "RemediationAction" ;
+    rdfs:comment "Proposed remediation action pending human approval." .
+
+rca:Approval a owl:Class ;
+    rdfs:label "Approval" ;
+    rdfs:comment "Human approval/rejection record for a remediation action." .
+
+# =============================================================================
+# OBJECT PROPERTIES (Relationships)
+# =============================================================================
+
+# ── Manufacturing hierarchy ─────────────────────────────────────────
+
+rca:HAS_LINE a owl:ObjectProperty ;
+    rdfs:domain rca:Plant ;
+    rdfs:range rca:Line ;
+    rdfs:label "HAS_LINE" .
+
+rca:HAS_MACHINE a owl:ObjectProperty ;
+    rdfs:domain rca:Line ;
+    rdfs:range rca:Machine ;
+    rdfs:label "HAS_MACHINE" .
+
+rca:HAS_SENSOR a owl:ObjectProperty ;
+    rdfs:domain rca:Machine ;
+    rdfs:range rca:Sensor ;
+    rdfs:label "HAS_SENSOR" .
+
+rca:HAS_TAG a owl:ObjectProperty ;
+    rdfs:domain rca:Sensor ;
+    rdfs:range rca:Tag ;
+    rdfs:label "HAS_TAG" .
+
+# ── Production ──────────────────────────────────────────────────────
+
+rca:RUNS a owl:ObjectProperty ;
+    rdfs:domain rca:Line ;
+    rdfs:range rca:WorkOrder ;
+    rdfs:label "RUNS" .
+
+rca:PRODUCES a owl:ObjectProperty ;
+    rdfs:domain rca:WorkOrder ;
+    rdfs:range rca:Batch ;
+    rdfs:label "PRODUCES" .
+
+rca:FOR_PRODUCT a owl:ObjectProperty ;
+    rdfs:domain rca:WorkOrder ;
+    rdfs:range rca:Product ;
+    rdfs:label "FOR_PRODUCT" .
+
+rca:PROCESSED a owl:ObjectProperty ;
+    rdfs:domain rca:Machine ;
+    rdfs:range rca:MaterialLot ;
+    rdfs:label "PROCESSED" ;
+    rdfs:comment "Machine processed material from this lot." .
+
+rca:USED_COMPONENT a owl:ObjectProperty ;
+    rdfs:domain rca:Machine ;
+    rdfs:range rca:Component ;
+    rdfs:label "USED_COMPONENT" .
+
+# ── Personnel ───────────────────────────────────────────────────────
+
+rca:OPERATED_BY a owl:ObjectProperty ;
+    rdfs:domain rca:Machine ;
+    rdfs:range rca:Operator ;
+    rdfs:label "OPERATED_BY" .
+
+rca:DURING_SHIFT a owl:ObjectProperty ;
+    rdfs:domain rca:WorkOrder ;
+    rdfs:range rca:Shift ;
+    rdfs:label "DURING_SHIFT" .
+
+rca:HANDOVER_TO a owl:ObjectProperty ;
+    rdfs:domain rca:Shift ;
+    rdfs:range rca:Shift ;
+    rdfs:label "HANDOVER_TO" ;
+    rdfs:comment "Shift handover relationship." .
+
+rca:MEMBER_OF a owl:ObjectProperty ;
+    rdfs:domain rca:Operator ;
+    rdfs:range rca:Crew ;
+    rdfs:label "MEMBER_OF" .
+
+# ── Maintenance ─────────────────────────────────────────────────────
+
+rca:SERVICED a owl:ObjectProperty ;
+    rdfs:domain rca:MaintenanceLog ;
+    rdfs:range rca:Machine ;
+    rdfs:label "SERVICED" .
+
+rca:PERFORMED a owl:ObjectProperty ;
+    rdfs:domain rca:Crew ;
+    rdfs:range rca:MaintenanceLog ;
+    rdfs:label "PERFORMED" .
+
+rca:CALIBRATED a owl:ObjectProperty ;
+    rdfs:domain rca:CalibrationEvent ;
+    rdfs:range rca:Machine ;
+    rdfs:label "CALIBRATED" .
+
+rca:CALIBRATED_BY a owl:ObjectProperty ;
+    rdfs:domain rca:CalibrationEvent ;
+    rdfs:range rca:Crew ;
+    rdfs:label "CALIBRATED_BY" .
+
+# ── Supply Chain ────────────────────────────────────────────────────
+
+rca:SUPPLIED_BY a owl:ObjectProperty ;
+    rdfs:domain rca:MaterialLot ;
+    rdfs:range rca:Supplier ;
+    rdfs:label "SUPPLIED_BY" .
+
+rca:SUPPLIES_TO a owl:ObjectProperty ;
+    rdfs:domain rca:Supplier ;
+    rdfs:range rca:Supplier ;
+    rdfs:label "SUPPLIES_TO" ;
+    rdfs:comment "Tier chain: Tier-3 SUPPLIES_TO Tier-2 SUPPLIES_TO Tier-1." .
+
+rca:FROM_LOT a owl:ObjectProperty ;
+    rdfs:domain rca:Component ;
+    rdfs:range rca:MaterialLot ;
+    rdfs:label "FROM_LOT" .
+
+# ── Quality ─────────────────────────────────────────────────────────
+
+rca:MAPS_TO a owl:ObjectProperty ;
+    rdfs:domain rca:DefectCode ;
+    rdfs:range rca:FailureMode ;
+    rdfs:label "MAPS_TO" .
+
+rca:HAS_CAUSE a owl:ObjectProperty ;
+    rdfs:domain rca:FailureMode ;
+    rdfs:range rca:Cause ;
+    rdfs:label "HAS_CAUSE" .
+
+rca:CONTROLLED_BY a owl:ObjectProperty ;
+    rdfs:domain rca:Product ;
+    rdfs:range rca:ControlPlan ;
+    rdfs:label "CONTROLLED_BY" .
+
+# ── Incident and Decision ──────────────────────────────────────────
+
+rca:AFFECTS_LINE a owl:ObjectProperty ;
+    rdfs:domain rca:Incident ;
+    rdfs:range rca:Line ;
+    rdfs:label "AFFECTS_LINE" .
+
+rca:AFFECTS_MACHINE a owl:ObjectProperty ;
+    rdfs:domain rca:Incident ;
+    rdfs:range rca:Machine ;
+    rdfs:label "AFFECTS_MACHINE" .
+
+rca:HAS_DECISION a owl:ObjectProperty ;
+    rdfs:domain rca:Incident ;
+    rdfs:range rca:DecisionObject ;
+    rdfs:label "HAS_DECISION" .
+
+rca:HAS_EVIDENCE a owl:ObjectProperty ;
+    rdfs:domain rca:DecisionObject ;
+    rdfs:range rca:EvidenceLink ;
+    rdfs:label "HAS_EVIDENCE" .
+
+rca:CHAIN_NEXT a owl:ObjectProperty ;
+    rdfs:domain rca:DecisionObject ;
+    rdfs:range rca:DecisionObject ;
+    rdfs:label "CHAIN_NEXT" ;
+    rdfs:comment "Links decision chain: Detect -> Diagnose -> Classify -> Forecast -> Remediate." .
+
+rca:PROPOSES a owl:ObjectProperty ;
+    rdfs:domain rca:DecisionObject ;
+    rdfs:range rca:RemediationAction ;
+    rdfs:label "PROPOSES" .
+
+rca:REQUIRES_APPROVAL a owl:ObjectProperty ;
+    rdfs:domain rca:RemediationAction ;
+    rdfs:range rca:Approval ;
+    rdfs:label "REQUIRES_APPROVAL" .
+
+rca:LINKED_TO a owl:ObjectProperty ;
+    rdfs:domain rca:EvidenceLink ;
+    rdfs:comment "Points to the evidence node (Machine, Lot, Crew, Sensor, etc.)." ;
+    rdfs:label "LINKED_TO" .
+
+# =============================================================================
+# DATATYPE PROPERTIES (selected key properties with types)
+# =============================================================================
+
+rca:lot_number a owl:DatatypeProperty ;
+    rdfs:domain rca:MaterialLot ;
+    rdfs:range xsd:string .
+
+rca:tier a owl:DatatypeProperty ;
+    rdfs:domain rca:Supplier ;
+    rdfs:range xsd:integer .
+
+rca:confidence a owl:DatatypeProperty ;
+    rdfs:domain rca:DecisionObject ;
+    rdfs:range xsd:float .
+
+rca:stage a owl:DatatypeProperty ;
+    rdfs:domain rca:DecisionObject ;
+    rdfs:range xsd:string .
+
+rca:calibration_step_completed a owl:DatatypeProperty ;
+    rdfs:domain rca:MaintenanceLog ;
+    rdfs:range xsd:boolean .
+
+rca:severity_score a owl:DatatypeProperty ;
+    rdfs:domain rca:FailureMode ;
+    rdfs:range xsd:integer .
+
+rca:occurrence_score a owl:DatatypeProperty ;
+    rdfs:domain rca:FailureMode ;
+    rdfs:range xsd:integer .
+
+rca:detection_score a owl:DatatypeProperty ;
+    rdfs:domain rca:FailureMode ;
+    rdfs:range xsd:integer .
+
+# =============================================================================
+# EQUIVALENCE (Alias Resolution)
+# =============================================================================
+
+# ERP "Supplier" == QMS "Vendor" — resolved via ontology equivalence
+# skos:altLabel "Vendor" on rca:Supplier class covers this.
+# Entity resolution step in ingestion handles deduplication.
