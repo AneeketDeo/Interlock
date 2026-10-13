@@ -144,12 +144,16 @@ export const useAppStore = create<AppState>((set, get) => ({
   crews: MAINTENANCE_CREWS,
 
   setTheme: (theme) => {
-    document.documentElement.setAttribute('data-theme', theme);
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
     set({ theme });
   },
   toggleTheme: () => {
     const nextTheme = get().theme === 'night' ? 'day' : 'night';
-    document.documentElement.setAttribute('data-theme', nextTheme);
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', nextTheme);
+    }
     set({ theme: nextTheme });
   },
   setRole: (role) => set({ role }),

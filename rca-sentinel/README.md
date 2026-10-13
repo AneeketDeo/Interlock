@@ -26,7 +26,39 @@
 
 ---
 
-## 2. System Architecture
+## 2. Frontend Operator Console & Visual Showcase
+
+The RCA-Sentinel frontend is an industrial control-room operator console built with React 18, TypeScript, Tailwind CSS, Zustand, React Flow, and D3. It provides deterministic offline simulation (`VITE_DATA_MODE=mock`) and live SSE/REST integration (`VITE_DATA_MODE=live`).
+
+### Command Center (Night Shift & Day Shift)
+| Night Shift (Control Room Default - `T` to toggle) | Day Shift (Executive Review & Projector Mode) |
+| :---: | :---: |
+| ![Command Center Night](docs/screenshots/command_center_night.png) | ![Command Center Day](docs/screenshots/command_center_day.png) |
+
+### Incident Case Board & Multi-Hop Evidence Graph
+![Incident Case Board](docs/screenshots/screen_incident.png)
+*5-stage automated D2-D5 diagnostic tracker with interactive React Flow knowledge-graph isolating Supplier Lot #40921 and Crew B skipped calibration.*
+
+### Financial Blast Radius & Human Approval Gate
+| Multi-Tier Forward Blast Radius ($184.8k Exposure) | Human-in-the-Loop Gated Actions ($128.4k Saved) |
+| :---: | :---: |
+| ![Impact Radius](docs/screenshots/screen_impact.png) | ![Approval Gate](docs/screenshots/screen_approvals.png) |
+
+---
+
+## 3. 3-Minute Hackathon Presentation Script
+
+| Time | Screen | Narrative & What Judges See |
+| :--- | :--- | :--- |
+| **0:00 - 0:35** | **Command Center** (`/`) | **What is wrong on the floor?** 4 lines running nominally $\rightarrow$ sudden 12.2% scrap spike trips CUSUM alarm on Line 03. Machine Station-03B enters thermal runaway. Live conveyor particles, KPI strip, and financial exposure update in real time. |
+| **0:35 - 1:25** | **Case Board** (`/incident`) | **Why did it happen? (Evidence-Backed Root Cause)** Google ADK agents traverse the Neo4j graph in 1.2s. The **Root Cause Reveal** traces backward from Station-03B to find the compound cause: AlloyTech Lot #40921 (1.82% Si vs 1.35% spec) + Crew B skipped dial-indicator tramming during a 4-minute rushed handover. Alternative decoys are automatically dimmed. |
+| **1:25 - 2:05** | **Blast Radius** (`/impact`) | **What will it cost?** Sankey flow maps the 420 contaminated assemblies across Tesla PO-9912 and Boeing PO-9940. Unmitigated exposure: **$184,800**. Avoided loss with immediate containment: **$128,400**. |
+| **2:05 - 2:40** | **Approval Gate** (`/approvals`) | **What to do? (Human in the Loop)** AI agents cannot actuate physical hardware alone. 3 gated action cards: 1) PLC Emergency Feed-Hold, 2) ERP Quarantine & Feeder Reroute to Verified Buffer Lot #40889, 3) Emergency Spindle Tramming Dispatch. Reliability engineer reviews before/after and digitally signs. |
+| **2:40 - 3:00** | **Resolution** (`/`) | **Did it work?** Physical interlock holds Station-03b, conveyor feed reroutes to verified clean alloy, line scrap drops back to 0.8%, avoiding $128,400 in plant loss. Formal 8D report is auto-populated for audit compliance. |
+
+---
+
+## 4. System Architecture
 
 ```mermaid
 flowchart TD
