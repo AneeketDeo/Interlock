@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     app_name: str = "rca-sentinel"
     app_version: str = "0.1.0"
     log_level: str = "INFO"
-    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
+    cors_origins: list[str] | str = Field(default_factory=lambda: ["http://localhost:5173"])
     secret_key: str = "change-me-to-a-random-secret-key"
 
     # ── Neo4j Aura ──────────────────────────────────────────────────
@@ -94,7 +94,7 @@ class Settings(BaseSettings):
     @classmethod
     def parse_cors_origins(cls, v: str | list[str]) -> list[str]:
         if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
         return v
 
     @property

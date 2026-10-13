@@ -1,0 +1,121 @@
+/* ==========================================================================
+   RCA-Sentinel Design System Tokens
+   Industrial Control Room Aesthetics: Night Shift (Default) & Day Shift
+   ========================================================================== */
+
+:root,
+:root[data-theme="night"] {
+  /* Surfaces */
+  --surface-canvas: #0A121D;
+  --surface-panel: #0F1B2A;
+  --surface-raised: #16283A;
+  --surface-overlay: #1D3349;
+  --surface-muted: #132233;
+
+  /* Borders & Dividers */
+  --border-subtle: #1C3044;
+  --border-strong: #2A4157;
+  --border-active: #4C8DFF;
+
+  /* Text & Labels */
+  --text-primary: #E6EDF3;
+  --text-secondary: #97A8B9;
+  --text-muted: #607386;
+  --text-inverse: #0A121D;
+
+  /* Operational State Semantics */
+  --status-healthy: #3DD6A5;
+  --status-healthy-bg: #0D2D24;
+  --status-healthy-border: #165643;
+
+  --status-caution: #FFB000;
+  --status-caution-bg: #332400;
+  --status-caution-border: #664800;
+
+  --status-critical: #FF5A3C;
+  --status-critical-bg: #33120C;
+  --status-critical-border: #662419;
+
+  --agent-cobalt: #4C8DFF;
+  --agent-cobalt-bg: #0F2347;
+  --agent-cobalt-border: #1E468F;
+
+  /* Shadows for High-Elevation Overlay */
+  --shadow-overlay: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-strong);
+}
+
+:root[data-theme="day"] {
+  /* Day Shift (High-Legibility Warm Architectural Paper for Executive Reviews) */
+  --surface-canvas: #EBEEF2;
+  --surface-panel: #FFFFFF;
+  --surface-raised: #F4F6F9;
+  --surface-overlay: #FFFFFF;
+  --surface-muted: #E2E7ED;
+
+  --border-subtle: #D5DCE4;
+  --border-strong: #A8B5C4;
+  --border-active: #2369E8;
+
+  --text-primary: #121C26;
+  --text-secondary: #4A5B6D;
+  --text-muted: #7E90A3;
+  --text-inverse: #FFFFFF;
+
+  --status-healthy: #15986C;
+  --status-healthy-bg: #E3F8F1;
+  --status-healthy-border: #A3E7D1;
+
+  --status-caution: #CC7A00;
+  --status-caution-bg: #FFF7E6;
+  --status-caution-border: #FFD480;
+
+  --status-critical: #D92B0C;
+  --status-critical-bg: #FEECE8;
+  --status-critical-border: #F9A494;
+
+  --agent-cobalt: #1F6BE8;
+  --agent-cobalt-bg: #EBF3FF;
+  --agent-cobalt-border: #A3C9FF;
+
+  --shadow-overlay: 0 16px 36px rgba(18, 28, 38, 0.12), 0 0 0 1px var(--border-strong);
+}
+
+/* Typography Utility Settings */
+body {
+  font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--surface-canvas);
+  color: var(--text-primary);
+  color-scheme: dark;
+}
+
+:root[data-theme="day"] body {
+  color-scheme: light;
+}
+
+.font-heading,
+.font-display,
+h1, h2, h3, h4, .kpi-numeral {
+  font-family: 'Barlow Semi Condensed', -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "cv02" 1, "zero" 1;
+}
+
+/* Scrollbars for dense operations panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface-canvas);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}

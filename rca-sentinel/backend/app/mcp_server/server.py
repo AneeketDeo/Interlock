@@ -78,4 +78,8 @@ async def resource_pfmea() -> list[dict[str, Any]]:
 
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(
+        transport="sse",
+        host=settings.mcp_server_host,
+        port=settings.mcp_server_port,
+    )

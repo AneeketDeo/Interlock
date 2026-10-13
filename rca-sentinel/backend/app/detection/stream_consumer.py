@@ -122,3 +122,79 @@ class TelemetryStreamConsumer:
             if res:
                 created_incidents.append(res)
         return created_incidents
+
+
+async def run_worker() -> None:
+    """Continuous stream consumer worker entry point."""
+    import asyncio
+    from app.core.config import get_settings
+    from app.core.database import close_timescale_client, init_timescale_client
+    from app.core.redis import close_redis_client, get_redis_client, init_redis_client
+    from app.graph.client import close_neo4j_client, init_neo4j_client
+
+    settings = get_settings()
+    logger.info("stream_consumer_worker_starting", env=settings.app_env)
+
+    try:
+        await init_neo4j_client(settings)
+    except Exception as e:
+        logger.warning("neo4j_init_deferred_in_worker", error=str(e))
+
+    try:
+        await init_timescale_client(settings)
+    except Exception as e:
+        logger.warning("timescale_init_deferred_in_worker", error=str(e))
+
+    await init_redis_client(settings)
+    redis = get_redis_client()
+    consumer = TelemetryStreamConsumer()
+    logger.info("stream_consumer_worker_listening", stream="rca:stream:telemetry")
+
+    stream_key = "rca:stream:telemetry"
+    last_id = "$"
+
+    try:
+        while True:
+            try:
+                messages = await redis.stream_read(
+                    "telemetry", last_id=last_id, count=50, block=2000
+                )
+                if messages:
+                    for msg_id, payload in messages:
+                        last_id = msg_id
+                        sensor_id = payload.get("sensor_id", "")
+                        tag = payload.get("tag", "")
+                        try:
+                            value = float(payload.get("value", 0.0))
+                        except (ValueError, TypeError):
+                            continue
+                        raw_ts = payload.get("timestamp")
+                        ts = (
+                            datetime.fromisoformat(raw_ts)
+                            if raw_ts
+                            else datetime.now()
+                        )
+                        await consumer.process_reading(
+                            sensor_id=sensor_id,
+                            tag=tag,
+                            value=value,
+                            timestamp=ts,
+                        )
+                else:
+                    await asyncio.sleep(0.1)
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error("stream_consumer_iteration_error", error=str(e))
+                await asyncio.sleep(1.0)
+    finally:
+        logger.info("stream_consumer_worker_shutting_down")
+        await close_neo4j_client()
+        await close_timescale_client()
+        await close_redis_client()
+
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(run_worker())
+

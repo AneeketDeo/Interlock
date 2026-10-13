@@ -5,7 +5,8 @@ from __future__ import annotations
 import functools
 import hashlib
 import json
-from typing import Any, Callable, Coroutine
+from collections.abc import Callable, Coroutine
+from typing import Any
 
 from app.core.logging import get_logger
 from app.core.redis import get_redis_client
