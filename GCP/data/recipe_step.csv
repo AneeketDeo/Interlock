@@ -1,0 +1,10 @@
+recipe_step_id,line_id,seq,name,temp_setpoint_c
+RS-L1-1,L1,1,Rough,62
+RS-L1-2,L1,2,Semi-finish,62
+RS-L1-3,L1,3,Finish,62
+RS-L2-1,L2,1,Rough,62
+RS-L2-2,L2,2,Semi-finish,62
+RS-L2-3,L2,3,Finish,62
+RS-L3-1,L3,1,Rough,62
+RS-L3-2,L3,2,Semi-finish,62
+RS-L3-3,L3,3,Finish,62

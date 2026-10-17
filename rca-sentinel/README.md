@@ -5,10 +5,11 @@
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
 [![Google ADK](https://img.shields.io/badge/Google%20ADK-2.11+-4285F4.svg)](https://github.com/google/adk)
-[![FastMCP](https://img.shields.io/badge/FastMCP-2.0+-FF6F00.svg)](https://github.com/jlowin/fastmcp)
-[![Neo4j Aura](https://img.shields.io/badge/Neo4j-Aura%20Enterprise-008CC1.svg)](https://neo4j.com/cloud/aura/)
-[![TimescaleDB](https://img.shields.io/badge/TimescaleDB-PostgreSQL%2016-FDB515.svg)](https://www.timescale.com/)
-[![Redis](https://img.shields.io/badge/Redis-7%20Streams-DC382D.svg)](https://redis.io/)
+[![Google Cloud](https://img.shields.io/badge/Google%20Cloud-Platform-4285F4.svg)](https://cloud.google.com/)
+[![Spanner Graph](https://img.shields.io/badge/Cloud%20Spanner-Graph%20(ISO%20GQL)-4285F4.svg)](https://cloud.google.com/spanner/docs/graph-overview)
+[![BigQuery](https://img.shields.io/badge/Google%20BigQuery-Historian-669DF6.svg)](https://cloud.google.com/bigquery)
+[![Cloud Pub/Sub](https://img.shields.io/badge/Cloud%20Pub%2FSub-Telemetry-EA4335.svg)](https://cloud.google.com/pubsub)
+[![Vertex AI](https://img.shields.io/badge/Vertex%20AI-gemini--2.5--flash-34A853.svg)](https://cloud.google.com/vertex-ai)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
@@ -18,10 +19,10 @@
 **RCA-Sentinel** is an enterprise manufacturing diagnostic platform that detects production line anomalies, traverses an ontology-backed knowledge graph to isolate compound root causes across physical equipment, material supply chains, and maintenance logs, forecasts downstream financial blast radius, and drafts gated containment and corrective actions.
 
 ### Core Capabilities
-- **Hybrid Data Architecture**: High-frequency PLC sensor telemetry and streaming quality metrics in **TimescaleDB**; full plant topology, material traceability, PFMEA taxonomies, and maintenance history in **Neo4j Aura**.
-- **Reactive Statistical Detection**: Streaming EWMA, CUSUM, and rolling Z-score detectors running against Redis Streams with consecutive signal suppression.
-- **FastMCP Tooling**: Clean Model Context Protocol server exposing multi-hop graph traversals, commonality analysis, blast radius calculation, and action proposal endpoints to AI agents.
-- **Sequential Agentic Pipeline (Google ADK)**: Five specialized LLM agents (Detect $\rightarrow$ Diagnose $\rightarrow$ Classify $\rightarrow$ Forecast $\rightarrow$ Remediate) executing structured 8D and PFMEA diagnostic workflows grounded on live graph data.
+- **Native Google Cloud Architecture**: High-frequency PLC sensor telemetry historian in **Google BigQuery**; full plant topology, material traceability, PFMEA taxonomies, and maintenance history in **Google Cloud Spanner Graph** (ISO GQL).
+- **Reactive Streaming Ingestion**: High-throughput real-time event streaming via **Google Cloud Pub/Sub** feeding streaming EWMA, CUSUM, and rolling Z-score detectors with consecutive signal suppression.
+- **FastMCP Tooling**: Clean Model Context Protocol server exposing multi-hop Spanner Graph traversals, commonality analysis, blast radius calculation, and action proposal endpoints to AI agents.
+- **Sequential Agentic Pipeline (Google ADK on Vertex AI)**: Five specialized LLM agents (Detect $\rightarrow$ Diagnose $\rightarrow$ Classify $\rightarrow$ Forecast $\rightarrow$ Remediate) executing structured 8D and PFMEA diagnostic workflows grounded on live Spanner Graph data using `gemini-2.5-flash`.
 - **Human-in-the-Loop (HITL) Safety & Guardrails**: Strict policy engine with mandatory approval gating for all physical actuators (PLC interlocks, ERP quarantine, CMMS work orders), dry-run defaults, an emergency kill switch, and automated PII / hallucination scrubbing callbacks.
 
 ---
@@ -62,44 +63,45 @@ The RCA-Sentinel frontend is an industrial control-room operator console built w
 
 ```mermaid
 flowchart TD
-    subgraph DataPlane ["Telemetry & Event Ingestion"]
-        PLC["PLC Sensors / Machine Streams"] --> TS["TimescaleDB (Hypertable)"]
-        PLC --> RS["Redis Streams (rca:stream:telemetry)"]
-        ERP["ERP & CMMS Records"] --> ING["Ingestion Pipeline (SHACL Validated)"]
-        ING --> NEO["Neo4j Aura Knowledge Graph"]
+    subgraph DataPlane ["Telemetry & Event Ingestion (GCP)"]
+        PLC["PLC Sensors / Machine Streams"] --> PS["Google Cloud Pub/Sub (telemetry-ingest-topic)"]
+        ERP["ERP & CMMS Line Records"] --> SPAN_ING["Spanner Ingestion Worker"]
+        SPAN_ING --> SPAN["Google Cloud Spanner Graph (FactoryGraph)"]
     end
 
-    subgraph DetectionPlane ["Anomaly Detection Engine"]
-        RS --> DET["Stream Consumer (EWMA / CUSUM)"]
-        DET --> INC["Incident Created (rca:cache:incident)"]
+    subgraph DetectionPlane ["Anomaly Detection Engine & Historian (Cloud Run & BQ)"]
+        PS --> DET["Cloud Run Stream Consumer (EWMA / CUSUM)"]
+        DET --> BQ["Google BigQuery (Historian Partitioned Dataset)"]
+        DET --> INC["Incident Created (Cloud Spanner Incidents Table)"]
     end
 
-    subgraph AgenticPipeline ["Google ADK Multi-Agent Pipeline"]
+    subgraph AgenticPipeline ["Google ADK Multi-Agent Pipeline (Vertex AI)"]
         INC --> AG1["1. DetectAgent (D2 Problem Description)"]
         AG1 --> AG2["2. DiagnoseAgent (D4 Root Cause Identification)"]
         AG2 --> AG3["3. ClassifyAgent (PFMEA Catalog & RPN)"]
         AG3 --> AG4["4. ForecastAgent (Blast Radius & Financial Risk)"]
         AG4 --> AG5["5. RemediateAgent (D3 Containment & D5 Actions)"]
+        AG1 & AG2 & AG3 & AG4 & AG5 -.-> VAI["Vertex AI (gemini-2.5-flash)"]
     end
 
-    subgraph MCPPlane ["FastMCP Server (:8001)"]
-        AG1 & AG2 & AG3 & AG4 & AG5 <--> MCP["FastMCP Server (JSON-RPC)"]
-        MCP <--> NEO
-        MCP <--> TS
+    subgraph MCPPlane ["FastMCP Server on Cloud Run (:8001)"]
+        AG1 & AG2 & AG3 & AG4 & AG5 <--> MCP["FastMCP Tool Server (JSON-RPC)"]
+        MCP <--> |"ISO GQL"| SPAN
+        MCP <--> |"Historical SQL"| BQ
     end
 
     subgraph SafetyPlane ["Safety & HITL Policy Engine"]
         AG5 --> PROP["Action Proposal (PENDING)"]
         PROP --> APPR{"Human Engineer Approval Gate"}
         APPR -- "Approved" --> ACT["Actuators (DRY_RUN / Execution)"]
-        APPR -- "Rejected" --> AUDIT["Immutable Audit Log"]
+        APPR -- "Rejected" --> AUDIT["Spanner Immutable Audit Log"]
         ACT --> AUDIT
     end
 
-    subgraph Presentation ["Operator & Engineering Console"]
+    subgraph Presentation ["Operator & Engineering Console (Cloud Run)"]
         API["FastAPI REST & SSE / WS (:8000)"]
-        UI["React 18 + Vite Console (:5173)"]
-        NEO & TS & AUDIT --> API
+        UI["React 18 + Vite Console (:5173 / Firebase Hosting)"]
+        SPAN & BQ & AUDIT --> API
         API --> UI
     end
 ```
@@ -188,30 +190,32 @@ The FastMCP server (`backend/app/mcp_server/server.py`) operates on port `8001` 
 | Layer | Technologies |
 | :--- | :--- |
 | **Backend Framework** | Python 3.12, FastAPI, Pydantic v2, Uvicorn |
-| **Agentic AI** | Google ADK 2.11+, Gemini 2.5 Flash (`gemini-2.5-flash`), Jinja2 prompts |
+| **Agentic AI** | Google ADK 2.11+, **Vertex AI** (`gemini-2.5-flash`), Jinja2 prompts |
 | **Tool Interface** | FastMCP 2.0+ (Model Context Protocol, JSON-RPC) |
-| **Knowledge Graph** | Neo4j Aura (Hosted), Cypher, `rdflib` + `pyshacl` (Ontology & SHACL) |
-| **Time-Series Telemetry** | TimescaleDB (PostgreSQL 16 hypertable), `asyncpg` |
-| **Streaming & Cache** | Redis 7 (Streams, Consumer Groups, TTL Caching) |
+| **Knowledge Graph** | **Google Cloud Spanner Graph** (ISO GQL), Property Graph Schema |
+| **Time-Series Telemetry** | **Google BigQuery** (Day-partitioned & clustered telemetry historian) |
+| **Streaming Ingestion** | **Google Cloud Pub/Sub** (High-throughput FIFO/ordering ingestion) |
+| **Container Hosting** | **Google Cloud Run** (Serverless container runtime) |
 | **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, TanStack Query |
-| **DevOps & Quality** | Docker Compose, `uv`, `ruff`, `mypy` (strict), `pytest` |
+| **DevOps & Quality** | Cloud Build, `uv`, `ruff`, `mypy` (strict), `pytest` |
 
 ---
 
 ## 7. Prerequisites
 
-Before running RCA-Sentinel, ensure you have:
-1. **Docker & Docker Compose** (v2.20+)
-2. **Python 3.12+** and [`uv`](https://docs.astral.sh/uv/)
-3. **Node.js 20+** and `npm`
-4. **Neo4j Aura Instance**: A free or enterprise Aura DB instance (`neo4j+s://...`).
-5. **Google AI Studio API Key**: For Gemini model access (`GOOGLE_API_KEY`).
+Before running RCA-Sentinel on Google Cloud, ensure you have:
+1. **Google Cloud SDK (`gcloud`)** authenticated to your GCP project.
+2. **Cloud Spanner Instance** with a database containing the `FactoryGraph` property graph.
+3. **Cloud Pub/Sub Topic & Subscription** (`telemetry-ingest-topic`).
+4. **BigQuery Dataset** (`rca_sentinel.telemetry_historian`).
+5. **Vertex AI API Enabled** for `gemini-2.5-flash` model access.
+6. **Python 3.12+** and [`uv`](https://docs.astral.sh/uv/) / Node.js 20+
 
 ---
 
 ## 8. Configuration (`.env`)
 
-Copy `.env.example` to `.env` and fill in your credentials:
+Copy `.env.example` to `.env` and fill in your GCP configuration:
 
 ```bash
 cp .env.example .env
@@ -223,24 +227,21 @@ cp .env.example .env
 | `APP_NAME` | `rca-sentinel` | Application identifier |
 | `LOG_LEVEL` | `INFO` | Logging level (`DEBUG`, `INFO`, `WARNING`, `ERROR`) |
 | `CORS_ORIGINS` | `http://localhost:5173` | Allowed CORS origins for web console |
-| `SECRET_KEY` | - | Random application secret key |
-| `NEO4J_URI` | `neo4j+s://...` | Neo4j Aura connection URI |
-| `NEO4J_USERNAME` | `neo4j` | Neo4j username |
-| `NEO4J_PASSWORD` | - | Neo4j Aura database password |
-| `NEO4J_DATABASE` | `neo4j` | Target Neo4j database |
-| `TIMESCALE_HOST` | `timescaledb` | TimescaleDB host |
-| `TIMESCALE_PORT` | `5432` | TimescaleDB port |
-| `TIMESCALE_USER` | `rca` | PostgreSQL username |
-| `TIMESCALE_PASSWORD` | `rca_password` | PostgreSQL password |
-| `TIMESCALE_DB` | `rca_sentinel` | PostgreSQL database name |
-| `REDIS_URL` | `redis://redis:6379/0` | Redis connection URL |
-| `GOOGLE_API_KEY` | - | Google Gemini API key |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | LLM model for ADK agents |
+| `GCP_PROJECT_ID` | `rca-sentinel-cup-2026` | Google Cloud Project ID |
+| `GCP_LOCATION` | `us-central1` | Google Cloud primary compute region |
+| `SPANNER_INSTANCE_ID` | `rca-sentinel-graph` | Cloud Spanner instance identifier |
+| `SPANNER_DATABASE_ID` | `rca_db` | Cloud Spanner target database |
+| `SPANNER_GRAPH_NAME` | `FactoryGraph` | Spanner Property Graph name for ISO GQL |
+| `PUBSUB_TOPIC_ID` | `telemetry-ingest-topic`| Pub/Sub topic for PLC readings |
+| `PUBSUB_SUBSCRIPTION_ID`| `telemetry-anomaly-sub`| Pub/Sub subscription for anomaly worker |
+| `BIGQUERY_DATASET` | `rca_sentinel` | BigQuery historian dataset |
+| `BIGQUERY_TABLE` | `telemetry_historian` | BigQuery historian partitioned table |
+| `USE_VERTEX_AI` | `true` | Routes Google ADK to Vertex AI endpoints |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | LLM model for ADK agents on Vertex AI |
 | `GEMINI_TEMPERATURE` | `0.1` | Agent sampling temperature |
 | `AGENT_CONFIDENCE_THRESHOLD`| `0.7` | Minimum confidence score before human escalation |
 | `MCP_SERVER_HOST` | `0.0.0.0` | FastMCP host interface |
 | `MCP_SERVER_PORT` | `8001` | FastMCP port |
-| `MCP_AUTH_TOKEN` | - | FastMCP bearer token |
 | `API_HOST` | `0.0.0.0` | FastAPI host interface |
 | `API_PORT` | `8000` | FastAPI port |
 | `DRY_RUN` | `true` | When true, actuators simulate actions without physical I/O |
@@ -248,8 +249,6 @@ cp .env.example .env
 | `ACTUATOR_RATE_LIMIT` | `5` | Maximum actuator actions permitted per minute |
 | `SIMULATOR_SEED` | `42` | Random seed for deterministic synthetic generator |
 | `GOLDEN_SCENARIO_DATE` | `2024-09-15` | Timestamp anchor for the golden scenario |
-| `PROACTIVE_DETECTION_ENABLED`| `false` | Feature flag for Phase 2 graph ML drift detector |
-| `JWT_SECRET_KEY` | - | Signing secret for authentication tokens |
 
 ---
 

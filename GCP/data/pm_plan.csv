@@ -1,0 +1,4 @@
+plan_id,name,interval_days
+PM-CAL,Machine calibration,28
+PM-LUBE,Lubrication,7
+PM-FILTER,Filter replacement,14

@@ -130,15 +130,33 @@ async def run_worker() -> None:
     from app.core.config import get_settings
     from app.core.database import close_timescale_client, init_timescale_client
     from app.core.redis import close_redis_client, get_redis_client, init_redis_client
-    from app.graph.client import close_neo4j_client, init_neo4j_client
+    from app.graph.client import close_neo4j_client, close_spanner_graph_client, init_neo4j_client, init_spanner_graph_client
 
     settings = get_settings()
     logger.info("stream_consumer_worker_starting", env=settings.app_env)
 
-    try:
-        await init_neo4j_client(settings)
-    except Exception as e:
-        logger.warning("neo4j_init_deferred_in_worker", error=str(e))
+    # Initialize Graph Backend
+    if hasattr(settings, "spanner_database_id") and settings.spanner_database_id:
+        try:
+            await init_spanner_graph_client(settings)
+        except Exception as e:
+            logger.warning("spanner_init_deferred_in_worker", error=str(e))
+    else:
+        try:
+            await init_neo4j_client(settings)
+        except Exception as e:
+            logger.warning("neo4j_init_deferred_in_worker", error=str(e))
+
+    # Check for GCP Pub/Sub & BigQuery mode
+    if getattr(settings, "pubsub_subscription_id", None):
+        try:
+            from app.ingestion.gcp_pipeline import GcpTelemetryHistorianWorker
+            logger.info("starting_gcp_pubsub_bigquery_worker", subscription=settings.pubsub_subscription_id)
+            gcp_worker = GcpTelemetryHistorianWorker()
+            await gcp_worker.run()
+            return
+        except Exception as e:
+            logger.warning("gcp_worker_fallback_to_redis", error=str(e))
 
     try:
         await init_timescale_client(settings)

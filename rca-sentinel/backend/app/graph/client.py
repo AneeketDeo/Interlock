@@ -155,8 +155,162 @@ class Neo4jClient:
         return total
 
 
-# Module-level singleton (initialized during app lifespan)
+class SpannerGraphClient:
+    """Google Cloud Spanner Graph client with connection pooling and ISO GQL execution."""
+
+    DEFAULT_PROJECT_ID = "project-a8fa4909-225e-4882-b45"
+    DEFAULT_INSTANCE_ID = "rca"
+    DEFAULT_DATABASE_ID = "rca-db"
+    DEFAULT_GRAPH_NAME = "FactoryGraph"
+
+    def __init__(
+        self,
+        project_id: str | None = None,
+        instance_id: str | None = None,
+        database_id: str | None = None,
+        settings: Settings | None = None,
+    ) -> None:
+        self._settings = settings or get_settings()
+        self.project_id = (
+            project_id
+            or getattr(self._settings, "gcp_project_id", None)
+            or self.DEFAULT_PROJECT_ID
+        )
+        self.instance_id = (
+            instance_id
+            or getattr(self._settings, "spanner_instance_id", None)
+            or self.DEFAULT_INSTANCE_ID
+        )
+        self.database_id = (
+            database_id
+            or getattr(self._settings, "spanner_database_id", None)
+            or self.DEFAULT_DATABASE_ID
+        )
+        self.graph_name = (
+            getattr(self._settings, "spanner_graph_name", None)
+            or self.DEFAULT_GRAPH_NAME
+        )
+        self._client: Any = None
+        self._instance: Any = None
+        self._database: Any = None
+
+    def _ensure_connected_sync(self) -> None:
+        """Synchronously initialize Cloud Spanner client, instance, and database handles."""
+        if self._database is None:
+            from google.cloud import spanner
+            self._client = spanner.Client(project=self.project_id)
+            self._instance = self._client.instance(self.instance_id)
+            self._database = self._instance.database(self.database_id)
+            logger.info(
+                "spanner_graph_initialized",
+                project=self.project_id,
+                instance=self.instance_id,
+                database=self.database_id,
+                graph=self.graph_name,
+            )
+
+    async def connect(self) -> None:
+        """Initialize Cloud Spanner client, instance, and database handles."""
+        try:
+            self._ensure_connected_sync()
+        except Exception as exc:
+            raise GraphConnectionError(
+                f"Cannot connect to Cloud Spanner at {self.instance_id}/{self.database_id}: {exc}"
+            ) from exc
+
+    async def close(self) -> None:
+        """Close Spanner client resources."""
+        if self._client:
+            self._client.close()
+            self._client = None
+            self._database = None
+            self._instance = None
+            logger.info("spanner_graph_disconnected")
+
+    async def health_check(self) -> bool:
+        """Verify Spanner database connectivity."""
+        try:
+            self._ensure_connected_sync()
+            import asyncio
+            loop = asyncio.get_running_loop()
+
+            def _check() -> bool:
+                with self._database.snapshot() as snapshot:
+                    cursor = snapshot.execute_sql("SELECT 1")
+                    list(cursor)
+                return True
+
+            return await loop.run_in_executor(None, _check)
+        except Exception as exc:
+            logger.warning("spanner_health_check_failed", error=str(exc))
+            return False
+
+    def execute_gql_sync(
+        self,
+        query: str,
+        parameters: dict[str, Any] | None = None,
+        param_types_map: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
+        """Synchronously execute an ISO GQL query against Cloud Spanner database snapshot."""
+        self._ensure_connected_sync()
+        try:
+            results: list[dict[str, Any]] = []
+            with self._database.snapshot() as snapshot:
+                cursor = snapshot.execute_sql(
+                    query,
+                    params=parameters,
+                    param_types=param_types_map,
+                )
+                for row in cursor:
+                    row_dict = {}
+                    for field, val in zip(cursor.fields, row, strict=False):
+                        row_dict[field.name] = val
+                    results.append(row_dict)
+            return results
+        except Exception as exc:
+            raise GraphQueryError(
+                f"Cloud Spanner ISO GQL query failed: {exc}",
+                details={"query_preview": query[:200]},
+            ) from exc
+
+    async def execute_gql(
+        self,
+        query: str,
+        parameters: dict[str, Any] | None = None,
+        param_types_map: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
+        """Asynchronously execute an ISO GQL query using database.snapshot().execute_sql()."""
+        self._ensure_connected_sync()
+        try:
+            import asyncio
+            try:
+                loop = asyncio.get_running_loop()
+                return await loop.run_in_executor(
+                    None,
+                    lambda: self.execute_gql_sync(query, parameters, param_types_map),
+                )
+            except RuntimeError:
+                return self.execute_gql_sync(query, parameters, param_types_map)
+        except Exception as exc:
+            raise GraphQueryError(
+                f"Cloud Spanner ISO GQL query failed: {exc}",
+                details={"query_preview": query[:200]},
+            ) from exc
+
+    async def execute_read(
+        self,
+        query: str,
+        parameters: dict[str, Any] | None = None,
+        param_types_map: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> list[dict[str, Any]]:
+        """Compatible read interface executing ISO GQL or SQL against Spanner."""
+        return await self.execute_gql(query, parameters, param_types_map)
+
+
+# Module-level singletons
 _neo4j_client: Neo4jClient | None = None
+_spanner_graph_client: SpannerGraphClient | None = None
 
 
 def get_neo4j_client() -> Neo4jClient:
@@ -180,3 +334,27 @@ async def close_neo4j_client() -> None:
     if _neo4j_client:
         await _neo4j_client.close()
         _neo4j_client = None
+
+
+def get_spanner_graph_client() -> SpannerGraphClient:
+    """Get or instantiate the Cloud Spanner Graph client singleton."""
+    global _spanner_graph_client
+    if _spanner_graph_client is None:
+        _spanner_graph_client = SpannerGraphClient()
+    return _spanner_graph_client
+
+
+async def init_spanner_graph_client(settings: Settings | None = None) -> SpannerGraphClient:
+    """Initialize and connect the Cloud Spanner Graph client singleton."""
+    global _spanner_graph_client
+    _spanner_graph_client = SpannerGraphClient(settings)
+    await _spanner_graph_client.connect()
+    return _spanner_graph_client
+
+
+async def close_spanner_graph_client() -> None:
+    """Close the Cloud Spanner Graph client singleton."""
+    global _spanner_graph_client
+    if _spanner_graph_client:
+        await _spanner_graph_client.close()
+        _spanner_graph_client = None

@@ -1,0 +1,8 @@
+supplier_id,name,tier,iatf_certified,shares_batch_data
+SUP-T3-01,Meridian Specialty Steels,3,False,False
+SUP-T3-02,Orion Alloys,3,False,True
+SUP-T3-03,Kestrel Metals,3,False,True
+SUP-T2-01,Northgate Forgings,2,True,True
+SUP-T2-02,Vista Machining,2,True,True
+SUP-T1-01,Apex Drivetrain Systems,1,True,True
+SUP-T1-02,Helix Powertrain,1,True,True

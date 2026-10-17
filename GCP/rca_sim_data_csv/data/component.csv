@@ -1,0 +1,37 @@
+component_id,machine_id,name
+CMP-M01-SPN,M01,Spindle
+CMP-M01-CPM,M01,Coolant pump
+CMP-M01-FIX,M01,Clamp fixture
+CMP-M02-SPN,M02,Spindle
+CMP-M02-CPM,M02,Coolant pump
+CMP-M02-FIX,M02,Clamp fixture
+CMP-M03-SPN,M03,Spindle
+CMP-M03-CPM,M03,Coolant pump
+CMP-M03-FIX,M03,Clamp fixture
+CMP-M04-SPN,M04,Spindle
+CMP-M04-CPM,M04,Coolant pump
+CMP-M04-FIX,M04,Clamp fixture
+CMP-M05-SPN,M05,Spindle
+CMP-M05-CPM,M05,Coolant pump
+CMP-M05-FIX,M05,Clamp fixture
+CMP-M06-SPN,M06,Spindle
+CMP-M06-CPM,M06,Coolant pump
+CMP-M06-FIX,M06,Clamp fixture
+CMP-M07-SPN,M07,Spindle
+CMP-M07-CPM,M07,Coolant pump
+CMP-M07-FIX,M07,Clamp fixture
+CMP-M08-SPN,M08,Spindle
+CMP-M08-CPM,M08,Coolant pump
+CMP-M08-FIX,M08,Clamp fixture
+CMP-M09-SPN,M09,Spindle
+CMP-M09-CPM,M09,Coolant pump
+CMP-M09-FIX,M09,Clamp fixture
+CMP-M10-SPN,M10,Spindle
+CMP-M10-CPM,M10,Coolant pump
+CMP-M10-FIX,M10,Clamp fixture
+CMP-M11-SPN,M11,Spindle
+CMP-M11-CPM,M11,Coolant pump
+CMP-M11-FIX,M11,Clamp fixture
+CMP-M12-SPN,M12,Spindle
+CMP-M12-CPM,M12,Coolant pump
+CMP-M12-FIX,M12,Clamp fixture

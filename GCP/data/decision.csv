@@ -1,0 +1,3 @@
+decision_id,incident_id,decision_type,proposed_by,summary,status
+DEC-H1,INC-2026-0719-002,CORRECTIVE,EMP-E2,"Stop M10, replace wheel",EXECUTED
+DEC-H2,INC-2026-0825-003,CORRECTIVE,EMP-E1,Flush coolant on L2,EXECUTED

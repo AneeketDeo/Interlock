@@ -1,0 +1,13 @@
+machine_id,line_id,name,machine_type,install_year
+M01,L1,5-axis CNC mill 01,5-axis CNC mill,2018
+M02,L1,5-axis CNC mill 02,5-axis CNC mill,2018
+M03,L1,5-axis CNC mill 03,5-axis CNC mill,2021
+M04,L1,5-axis CNC mill 04,5-axis CNC mill,2019
+M05,L2,CNC turning center 05,CNC turning center,2019
+M06,L2,CNC turning center 06,CNC turning center,2019
+M07,L2,CNC turning center 07,CNC turning center,2018
+M08,L2,CNC turning center 08,CNC turning center,2018
+M09,L3,Gear grinder 09,Gear grinder,2022
+M10,L3,Gear grinder 10,Gear grinder,2018
+M11,L3,Gear grinder 11,Gear grinder,2018
+M12,L3,Gear grinder 12,Gear grinder,2018

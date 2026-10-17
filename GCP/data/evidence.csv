@@ -1,0 +1,11 @@
+evidence_id,incident_id,evidence_type,ref_id,summary
+EV-M02-SCRAP,INC-2026-1015-001,SCRAP_TREND,WO-20261014-N-M02,M02 scrap 11.8% over last two shifts vs 2.0% baseline
+EV-M02-TEMP,INC-2026-1015-001,TEMP_ANOMALY,ANM-0003,M02 temperature level shift since 2026-10-14T15:00:00Z
+EV-M03-SCRAP,INC-2026-1015-001,SCRAP_TREND,WO-20261014-N-M03,M03 scrap 12.2% over last two shifts vs 2.0% baseline
+EV-M03-TEMP,INC-2026-1015-001,TEMP_ANOMALY,ANM-0004,M03 temperature level shift since 2026-10-14T15:00:00Z
+EV-M06-SCRAP,INC-2026-1015-001,SCRAP_TREND,WO-20261014-N-M06,M06 scrap 12.5% over last two shifts vs 2.0% baseline
+EV-M06-TEMP,INC-2026-1015-001,TEMP_ANOMALY,ANM-0008,M06 temperature level shift since 2026-10-14T15:00:00Z
+EV-M09-SCRAP,INC-2026-1015-001,SCRAP_TREND,WO-20261014-N-M09,M09 scrap 11.3% over last two shifts vs 2.0% baseline
+EV-M09-TEMP,INC-2026-1015-001,TEMP_ANOMALY,ANM-0010,M09 temperature level shift since 2026-10-14T16:00:00Z
+EV-M11-SCRAP,INC-2026-1015-001,SCRAP_TREND,WO-20261014-N-M11,M11 scrap 12.6% over last two shifts vs 2.0% baseline
+EV-M11-TEMP,INC-2026-1015-001,TEMP_ANOMALY,ANM-0011,M11 temperature level shift since 2026-10-14T16:00:00Z

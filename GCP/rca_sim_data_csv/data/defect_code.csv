@@ -1,0 +1,5 @@
+defect_code,description
+DC-101,Bore dimension out of tolerance
+DC-205,Surface micro-fracture
+DC-310,Hardness out of range
+DC-402,Burr / surface finish

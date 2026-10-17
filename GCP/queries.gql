@@ -1,0 +1,40 @@
+-- common_lots: Lots currently in use on the incident's machines. Expect LOT-409 with machines = 5.
+-- params: incident, since
+GRAPH FactoryGraph
+MATCH (i:Incident {incident_id: @incident})-[:AFFECTS]->(m:Machine)-[p:PROCESSED]->(l:MaterialLot)
+WHERE p.last_used >= @since
+RETURN l.lot_id AS lot_id, COUNT(DISTINCT m.machine_id) AS machines
+ORDER BY machines DESC;
+
+-- common_crews: Crews that calibrated the incident's machines since @since. Expect CREW-B with machines = 5.
+-- params: incident, since
+GRAPH FactoryGraph
+MATCH (i:Incident {incident_id: @incident})-[:AFFECTS]->(m:Machine)<-[:CALIBRATED]-(c:Calibration)-[:CALIBRATION_ORDER]->(o:MaintenanceOrder)-[:PERFORMED_BY]->(cr:Crew)
+WHERE c.started_at >= @since
+RETURN cr.crew_id AS crew_id, COUNT(DISTINCT m.machine_id) AS machines, MIN(c.steps_completed) AS min_steps
+ORDER BY machines DESC;
+
+-- cause_intersection: Machines on the lot AND calibrated with a skipped step. Expect exactly M02, M03, M06, M09, M11.
+-- params: lot, since
+GRAPH FactoryGraph
+MATCH (m:Machine)-[:PROCESSED]->(l:MaterialLot {lot_id: @lot}),
+      (c:Calibration)-[:CALIBRATED]->(m)
+WHERE c.started_at >= @since AND c.steps_completed < c.steps_required
+RETURN m.machine_id AS machine_id, m.line_id AS line_id, c.calibration_id AS calibration_id, c.skipped_step AS skipped_step
+ORDER BY machine_id;
+
+-- blast_radius: Every machine that processed the lot. Expect 8 machines across L1, L2, L3.
+-- params: lot
+GRAPH FactoryGraph
+MATCH (m:Machine)-[p:PROCESSED]->(l:MaterialLot {lot_id: @lot})
+RETURN m.machine_id AS machine_id, m.line_id AS line_id, p.first_used AS first_used, p.units AS units
+ORDER BY machine_id;
+
+-- supplier_chain: Origin (Tier 3) supplier of the lot and everything downstream. Expect SUP-T3-01 -> SUP-T2-01 -> SUP-T1-01.
+-- params: lot
+GRAPH FactoryGraph
+MATCH (l:MaterialLot {lot_id: @lot})-[r:SUPPLIED_BY]->(t3:Supplier)-[:SUPPLIES]->{1,2}(s:Supplier)
+WHERE r.relation = 'ORIGIN'
+RETURN t3.supplier_id AS origin, s.supplier_id AS downstream, s.tier AS tier
+ORDER BY tier DESC;
+

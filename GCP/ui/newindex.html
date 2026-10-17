@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NexusYield AI — Autonomous Plant Control Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Vis.js Network CDN for Interactive Spanner Graph Visualization -->
+<script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<style>
+:root {
+  --bg-obsidian: #07090e;
+  --surface-base: #0f1523;
+  --surface-card: #141c2e;
+  --border-subtle: #1e293b;
+  --border-glow: #334155;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent-blue: #3b82f6;
+  --accent-indigo: #6366f1;
+  --ok: #10b981;
+  --bad: #ef4444;
+  --warn: #f59e0b;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background-color: var(--bg-obsidian); color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column;
+}
+
+/* Header & Tabs */
+header {
+  display: flex; justify-content: space-between; align-items: center; padding: 16px 36px;
+  background: rgba(15, 21, 35, 0.95); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-subtle);
+  position: sticky; top: 0; z-index: 100;
+}
+.brand h1 { font-size: 18px; font-weight: 700; margin: 0; background: linear-gradient(135deg, #60a5fa, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.nav-tabs { display: flex; gap: 8px; background: var(--surface-base); padding: 4px; border-radius: 12px; border: 1px solid var(--border-subtle); }
+.tab-btn {
+  background: transparent; border: 0; color: var(--text-muted); padding: 8px 16px; border-radius: 8px;
+  font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.tab-btn:hover { color: var(--text-main); }
+.tab-btn.active { background: var(--accent-blue); color: white; font-weight: 600; }
+
+.pill { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid; text-transform: uppercase; }
+.pill.grn { color: #6ee7b7; border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); }
+.pill.amb { color: #fcd34d; border-color: rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.1); }
+.pill.red { color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1); }
+
+/* Content Views */
+main { max-width: 1500px; width: 100%; margin: 0 auto; padding: 28px 36px; flex: 1; }
+.view-section { display: none; gap: 24px; grid-template-columns: repeat(12, 1fr); }
+.view-section.active { display: grid; }
+
+.card { background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: 18px; padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+.card h2 { margin: 0 0 16px 0; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+
+.kpi { grid-column: span 3; }
+.kpi .v { font-size: 28px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.kpi .l { color: var(--text-muted); font-size: 12px; margin-top: 6px; }
+
+.w12 { grid-column: span 12; }
+.w8 { grid-column: span 8; }
+.w4 { grid-column: span 4; }
+.w6 { grid-column: span 6; }
+
+/* Graph Canvas Styling */
+#spanner-graph-canvas {
+  width: 100%; height: 500px; background: var(--surface-base); border-radius: 12px; border: 1px solid var(--border-subtle);
+}
+
+/* Machine Grid & HITL */
+.machine-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.mach-card { background: var(--surface-base); border: 1px solid var(--border-subtle); padding: 14px; border-radius: 10px; text-align: center; }
+.mach-card b { font-family: 'JetBrains Mono', monospace; font-size: 14px; display: block; margin-bottom: 4px; }
+.mach-card.alert { border-color: rgba(239,68,68,0.5); background: rgba(239,68,68,0.08); color: #fca5a5; }
+.mach-card.decoy { opacity: 0.6; }
+
+.hitl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.act-card { border: 1px solid var(--border-subtle); border-radius: 14px; padding: 20px; background: var(--surface-base); display: flex; flex-direction: column; justify-content: space-between; }
+.act-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.act-card p { margin: 8px 0 16px 0; color: var(--text-muted); font-size: 13px; line-height: 1.5; }
+.step-tracker { display: flex; gap: 14px; font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 16px; }
+.step-tracker .active { color: var(--ok); font-weight: 600; }
+
+button { border: 0; border-radius: 8px; padding: 9px 18px; font-weight: 600; cursor: pointer; font-size: 12px; transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif; }
+button.approve { background: var(--ok); color: #022c22; }
+button.reject { background: transparent; color: var(--bad); border: 1px solid rgba(239, 68, 68, 0.4); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>NexusYield AI</h1>
+    <div style="font-size:11px; color:var(--text-muted);">Autonomous Spanner Graph & RCA Fabric</div>
+  </div>
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('exec')">1. Executive Analytics</button>
+    <button class="tab-btn " onclick="switchTab('pipelines')">2. Live Pipelines & SPC</button>
+    <button class="tab-btn" onclick="switchTab('graph')">3. Spanner Graph Topology</button>
+    <button class="tab-btn" onclick="switchTab('incident')">4. Incident Command & HITL</button>
+  </div>
+  <div><span id="conn-pill" class="pill grn">SPANNER DB: ACTIVE</span></div>
+</header>
+
+<main>
+  <!-- ================= TAB 1: EXECUTIVE ANALYTICS ================= -->
+  <section id="view-exec" class="view-section active">
+    <section class="card kpi">
+      <div class="v">71.86%</div>
+      <div class="l">Plant-Wide OEE (Target: 85.0%)</div>
+    </section>
+    <section class="card kpi">
+      <div class="v" style="color: var(--bad);">$823,722</div>
+      <div class="l">Total Financial Value at Risk</div>
+    </section>
+    <section class="card kpi">
+      <div class="v">5 / 12</div>
+      <div class="l">Systemic Scrap Spike Machines</div>
+    </section>
+    <section class="card kpi">
+      <div class="v">14.2 Min</div>
+      <div class="l">Mean Time to Respond (MTTR)</div>
+    </section>
+
+    <section class="card w8">
+      <h2>Overall Equipment Effectiveness (OEE) Loss Tree & Six Big Losses</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px;">
+        <div style="background:var(--surface-base); padding:16px; border-radius:12px; border:1px solid var(--border-subtle);">
+          <h3 style="margin:0 0 8px; font-size:13px;">Availability Loss</h3>
+          <div style="font-size:20px; font-weight:700; color:var(--bad); font-family:'JetBrains Mono';">11.2%</div>
+          <p style="font-size:11px; color:var(--text-muted); margin:6px 0 0;">Breakdowns & rushed changeovers.</p>
+        </div>
+        <div style="background:var(--surface-base); padding:16px; border-radius:12px; border:1px solid var(--border-subtle);">
+          <h3 style="margin:0 0 8px; font-size:13px;">Performance Loss</h3>
+          <div style="font-size:20px; font-weight:700; color:var(--warn); font-family:'JetBrains Mono';">9.5%</div>
+          <p style="font-size:11px; color:var(--text-muted); margin:6px 0 0;">Micro-stoppages & thermal drift.</p>
+        </div>
+        <div style="background:var(--surface-base); padding:16px; border-radius:12px; border:1px solid var(--border-subtle);">
+          <h3 style="margin:0 0 8px; font-size:13px;">Quality Loss</h3>
+          <div style="font-size:20px; font-weight:700; color:var(--bad); font-family:'JetBrains Mono';">7.4%</div>
+          <p style="font-size:11px; color:var(--text-muted); margin:6px 0 0;">Startup rejects & micro-fractures.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card w4">
+      <h2>Multivariate Ensemble Status</h2>
+      <div style="font-size: 13px; line-height: 1.6; color: var(--text-muted);">
+        <p>🟢 <b>Stream A:</b> Pub/Sub ingestion active.</p>
+        <p>🔴 <b>Active Alert:</b> Thermal CUSUM drift on LOT-409.</p>
+        <p>🛡️ <b>Decoy Firewall:</b> 7 false-positive sensor glitches suppressed.</p>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= TAB 2: LIVE PIPELINES & SPC ================= -->
+  <section id="view-pipelines" class="view-section">
+    <section class="card w12">
+      <h2>Machine Health Matrix & Multivariate Decoy Suppression</h2>
+      <div class="machine-grid" style="margin-top:12px;">
+        <div class="mach-card decoy"><b>M01 (L1)</b><small>Decoy Suppressed</small></div>
+        <div class="mach-card alert"><b>M02 (L1)</b><small>Scrap: 12.08% (Spike)</small></div>
+        <div class="mach-card alert"><b>M03 (L1)</b><small>Scrap: 12.67% (Spike)</small></div>
+        <div class="mach-card decoy"><b>M04 (L1)</b><small>Decoy Suppressed</small></div>
+        <div class="mach-card decoy"><b>M05 (L2)</b><small>Decoy Suppressed</small></div>
+        <div class="mach-card alert"><b>M06 (L2)</b><small>Scrap: 14.14% (Spike)</small></div>
+        <div class="mach-card decoy"><b>M07 (L2)</b><small>Decoy Suppressed</small></div>
+        <div class="mach-card decoy"><b>M08 (L2)</b><small>Decoy Suppressed</small></div>
+        <div class="mach-card alert"><b>M09 (L3)</b><small>Scrap: 12.60% (Spike)</small></div>
+        <div class="mach-card decoy"><b>M10 (L3)</b><small>Decoy Suppressed</small></div>
+        <div class="mach-card alert"><b>M11 (L3)</b><small>Scrap: 14.50% (Spike)</small></div>
+        <div class="mach-card decoy"><b>M12 (L3)</b><small>Decoy Suppressed</small></div>
+      </div>
+    </section>
+
+    <section class="card w12">
+      <h2>Ensemble SPC Control Charts (Modified Z-Score, EWMA, & CUSUM)</h2>
+      <div style="background: var(--surface-base); padding: 20px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted);">
+        <p>📈 [CUSUM Stream TEMP_M02]: Baseline Drift Detected at threshold h=4.0σ (Peak CUSUM: 34.11)</p>
+        <p>📈 [Isolation Forest M05]: Vibration spike (452.71) rejected due to zero scrap correlation.</p>
+        <p>📈 [Mahalanobis Distance M11]: Multivariate distance score = 2.88 (Cross-sensor divergence confirmed).</p>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= TAB 3: SPANNER GRAPH TOPOLOGY ================= -->
+  <section id="view-graph" class="view-section">
+    <section class="card w12">
+      <h2>Google Cloud Spanner Graph — ISA-95 Property Graph Inspector</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+        Interactive multi-hop traversal graph showing how the agent connected Tier-3 Supplier <b>SUP-T3-01</b> to <b>LOT-409</b>, <b>Crew B's skipped calibration</b>, and the <b>5 spiking machines</b>.
+      </p>
+      <!-- Interactive Vis.js Network Graph Container -->
+      <div id="spanner-graph-canvas"></div>
+    </section>
+  </section>
+
+  <!-- ================= TAB 4: INCIDENT COMMAND & HITL ================= -->
+  <section id="view-incident" class="view-section">
+    <section class="card w12">
+      <h2>Human-in-the-Loop (HITL) Governance Gate (D3 / D5 Remediation)</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Review agent-proposed actions before committing cryptographically to Spanner Graph and triggering downstream interlocks.</p>
+      
+      <div class="hitl-grid" id="hitl-container">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+  </section>
+</main>
+
+<script>
+// --- Tab Switching Logic ---
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+  
+  event.target.classList.add('active');
+  document.getElementById('view-' + tabId).classList.add('active');
+
+  // Trigger network redraw if Spanner Graph tab is selected
+  if (tabId === 'graph' && window.networkGraph) {
+    window.networkGraph.fit();
+  }
+}
+
+// --- Interactive Spanner Graph Rendering (Vis.network) ---
+function initSpannerGraph() {
+  const container = document.getElementById('spanner-graph-canvas');
+  const nodes = new vis.DataSet([
+    { id: 1, label: 'SUP-T3-01\n(Meridian Steel)', color: '#3b82f6', font: { color: '#fff' } },
+    { id: 2, label: 'LOT-409\n(Upper-Spec Edge)', color: '#ef4444', font: { color: '#fff' } },
+    { id: 3, label: 'Machine M02\n(Line L1)', color: '#ef4444', font: { color: '#fff' } },
+    { id: 4, label: 'Machine M03\n(Line L1)', color: '#ef4444', font: { color: '#fff' } },
+    { id: 5, label: 'Machine M06\n(Line L2)', color: '#ef4444', font: { color: '#fff' } },
+    { id: 6, label: 'Machine M09\n(Line L3)', color: '#ef4444', font: { color: '#fff' } },
+    { id: 7, label: 'Machine M11\n(Line L3)', color: '#ef4444', font: { color: '#fff' } },
+    { id: 8, label: 'CREW-B\n(Rushed Handover)', color: '#f59e0b', font: { color: '#fff' } },
+    { id: 9, label: 'Calibration CAL-0022\n(Step 6 Skipped)', color: '#f59e0b', font: { color: '#fff' } },
+  ]);
+
+  const edges = new vis.DataSet([
+    { from: 1, to: 2, label: 'SUPPLIED_BY', color: { color: '#94a3b8' } },
+    { from: 2, to: 3, label: 'PROCESSED', color: { color: '#ef4444' } },
+    { from: 2, to: 4, label: 'PROCESSED', color: { color: '#ef4444' } },
+    { from: 2, to: 5, label: 'PROCESSED', color: { color: '#ef4444' } },
+    { from: 2, to: 6, label: 'PROCESSED', color: { color: '#ef4444' } },
+    { from: 2, to: 7, label: 'PROCESSED', color: { color: '#ef4444' } },
+    { from: 8, to: 9, label: 'PERFORMED', color: { color: '#f59e0b' } },
+    { from: 9, to: 3, label: 'CALIBRATED', color: { color: '#f59e0b' } },
+  ]);
+
+  const data = { nodes: nodes, edges: edges };
+  const options = {
+    nodes: { shape: 'box', margin: 10, borderRadius: 8, borderWidth: 0 },
+    edges: { font: { size: 10, color: '#94a3b8' }, arrows: 'to' },
+    physics: { stabilization: true }
+  };
+
+  window.networkGraph = new vis.Network(container, data, options);
+}
+
+// --- HITL Governance Actions Logic ---
+const ACTIONS = [
+  { action_id: "A1", action_type: "ERP_LOT_QUARANTINE", target_id: "LOT-409", description: "Quarantine WIP and finished goods from LOT-409; hold remaining raw stock in ERP.", status: "PROPOSED" },
+  { action_id: "A2", action_type: "QUALITY_CONTAINMENT_D3", target_id: "SHIPPED_LOT-409_UNITS", description: "Contain 9,840 shipped units; trace and inspect at downstream customer facilities.", status: "PROPOSED" },
+  { action_id: "A3", action_type: "CMMS_RECALIBRATION", target_id: "M02, M03, M06, M09, M11", description: "Dispatch priority CMMS work order to execute mandatory Step 6 thermal offset calibration.", status: "PROPOSED" },
+  { action_id: "A4", action_type: "EQUIPMENT_INTERLOCK", target_id: "CALIBRATION_PROCESS", description: "Engage soft PLC interlock: block machine release until Step 6 is signed off by two authorized personnel.", status: "PROPOSED" }
+];
+
+const $ = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+
+function renderHITL() {
+  const container = document.getElementById("hitl-container");
+  container.replaceChildren();
+
+  ACTIONS.forEach(act => {
+    const box = $("div", "act-card");
+    const top = $("div", "act-top");
+    const statusColor = { PROPOSED: "amb", APPROVED: "grn", REJECTED: "red" }[act.status] || "grn";
+    
+    top.append($("span", `pill ${statusColor}`, act.status), $("b", 0, act.action_type + " → " + act.target_id));
+    box.append(top, $("p", 0, act.description));
+
+    const tracker = $("div", "step-tracker");
+    ["PROPOSED", "APPROVED", "EXECUTED"].forEach((stepName, idx) => {
+      const curIdx = ["PROPOSED", "APPROVED", "EXECUTED"].indexOf(act.status);
+      const activeClass = curIdx >= idx ? " active" : "";
+      tracker.append($("span", activeClass, (curIdx >= idx ? "● " : "○ ") + stepName));
+    });
+    box.append(tracker);
+
+    if (act.status === "PROPOSED") {
+      const btnRow = $("div", "action-buttons");
+      const btnApprove = $("button", "approve", "Approve & Commit");
+      const btnReject = $("button", "reject", "Reject");
+
+      btnApprove.onclick = () => handleDecision(act, "APPROVED", btnApprove, btnReject);
+      btnReject.onclick = () => handleDecision(act, "REJECTED", btnApprove, btnReject);
+
+      btnRow.append(btnApprove, btnReject);
+      box.append(btnRow);
+    } else {
+      box.append($("div", 0, `Locked state: ${act.status}`)).style = "font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono',monospace;";
+    }
+    container.append(box);
+  });
+}
+
+async function handleDecision(act, outcome, btnApprove, btnReject) {
+  btnApprove.disabled = true; btnReject.disabled = true;
+  const who = prompt("Enter Authorized Engineer ID:", "senior.engineer@plant.com");
+  if (!who) { btnApprove.disabled = false; btnReject.disabled = false; return; }
+
+  try {
+    const res = await fetch(`/api/actions/${encodeURIComponent(act.action_id)}/decision`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ outcome, approver_id: who })
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    act.status = data.status;
+  } catch (e) {
+    act.status = outcome;
+  }
+  renderHITL();
+}
+
+// Initialize graph and HITL on load
+window.addEventListener('DOMContentLoaded', () => {
+  initSpannerGraph();
+  renderHITL();
+});
+</script>
+</body>
+</html>

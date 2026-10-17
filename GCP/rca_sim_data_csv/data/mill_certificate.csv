@@ -1,0 +1,9 @@
+mill_cert_id,lot_id,heat_number,issued_by_supplier_id,hardness_hrc,carbon_pct,manganese_pct,within_spec,edge_flag,document_ref
+MC-377,LOT-377,H-77231,SUP-T3-03,29.6,0.201,1.12,True,,certs/MC-377.pdf
+MC-388,LOT-388,H-88104,SUP-T3-02,29.9,0.198,1.1,True,,certs/MC-388.pdf
+MC-392,LOT-392,H-92377,SUP-T3-02,30.2,0.205,1.15,True,,certs/MC-392.pdf
+MC-401,LOT-401,H-01455,SUP-T3-03,29.4,0.196,1.09,True,,certs/MC-401.pdf
+MC-403,LOT-403,H-03012,SUP-T3-02,30.0,0.202,1.13,True,,certs/MC-403.pdf
+MC-409,LOT-409,H-09918,SUP-T3-01,31.7,0.219,1.31,True,UPPER_EDGE_ALL,certs/MC-409.pdf
+MC-412,LOT-412,H-12040,SUP-T3-01,29.8,0.2,1.12,True,,certs/MC-412.pdf
+MC-415,LOT-415,H-15266,SUP-T3-03,29.7,0.199,1.11,True,,certs/MC-415.pdf

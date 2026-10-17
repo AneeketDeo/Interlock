@@ -1,0 +1,328 @@
+{
+  "scenario": "Scrap spike on 5 machines caused by the interaction of Tier-3 steel lot LOT-409 and a rushed-handover calibration that skipped thermal offset verification.",
+  "seed": 42,
+  "timestamps_utc": true,
+  "timeline": {
+    "lot_409_received": "2026-10-06T00:00:00Z",
+    "lot_409_first_use_by_machine": {
+      "M02": "2026-10-09T06:00:00Z",
+      "M03": "2026-10-09T14:00:00Z",
+      "M06": "2026-10-09T22:00:00Z",
+      "M09": "2026-10-09T06:00:00Z",
+      "M11": "2026-10-09T14:00:00Z",
+      "M04": "2026-10-09T22:00:00Z",
+      "M07": "2026-10-09T06:00:00Z",
+      "M10": "2026-10-09T14:00:00Z"
+    },
+    "rushed_handover": "2026-10-14T14:00:00Z",
+    "calibration_end_by_machine": {
+      "M01": "2026-10-14T14:45:00Z",
+      "M02": "2026-10-14T14:47:00Z",
+      "M03": "2026-10-14T15:23:00Z",
+      "M04": "2026-10-14T09:30:00Z",
+      "M05": "2026-10-14T09:30:00Z",
+      "M06": "2026-10-14T15:25:00Z",
+      "M07": "2026-10-14T11:05:00Z",
+      "M08": "2026-10-14T16:01:00Z",
+      "M09": "2026-10-14T16:03:00Z",
+      "M10": "2026-10-14T11:05:00Z",
+      "M11": "2026-10-14T16:39:00Z",
+      "M12": "2026-10-14T12:40:00Z"
+    },
+    "incident_detected": "2026-10-15T07:15:00Z",
+    "data_cutoff": "2026-10-15T07:00:00Z"
+  },
+  "root_cause": {
+    "lot_id": "LOT-409",
+    "tier3_supplier": "SUP-T3-01",
+    "tier2_supplier": "SUP-T2-01",
+    "tier1_supplier": "SUP-T1-01",
+    "mill_cert": "MC-409",
+    "lot_note": "within spec but at upper edge on hardness, carbon and manganese",
+    "crew": "CREW-B",
+    "handover_id": "HO-20261014-S",
+    "skipped_step": "Step 6: Thermal offset verification",
+    "calibration_orders": {
+      "M01": "MO-0021",
+      "M02": "MO-0022",
+      "M03": "MO-0023",
+      "M06": "MO-0024",
+      "M08": "MO-0025",
+      "M09": "MO-0026",
+      "M11": "MO-0027"
+    },
+    "classification": "Material & Method Vulnerability: Supplier Lot Variation + Missed Calibration Step",
+    "maps_to_failure_modes": [
+      "FM-01",
+      "FM-02"
+    ],
+    "mechanism": "interaction; neither factor alone produces the scrap spike"
+  },
+  "affected_machines": [
+    "M02",
+    "M03",
+    "M06",
+    "M09",
+    "M11"
+  ],
+  "must_not_conclude": [
+    "Supplier SUP-T3-01 alone is the cause (LOT-412 from the same supplier runs fine on M01)",
+    "Crew B alone is the cause (Crew B calibrated M05, M12, M04 correctly earlier; M01 and M08 were miscalibrated by Crew B with no scrap rise)",
+    "LOT-409 alone is the cause (M04, M07, M10 run LOT-409 with normal scrap)",
+    "Temperature drift alone is the cause (M01 and M08 show it without scrap rise)"
+  ],
+  "red_herrings": {
+    "M05_vibration_drift": "Slow vibration drift from Oct 11, alarms from about Oct 13; scrap normal",
+    "M12_pressure_glitch": "Three spurious pressure windows on Oct 8, sensor glitch",
+    "expired_training": [
+      "EMP-C2 (CNC turning center)",
+      "EMP-B3 (Gear grinder)"
+    ],
+    "short_handovers_without_followup": [
+      "2026-09-28T14:00:00Z",
+      "2026-10-03T22:00:00Z"
+    ],
+    "isolated_random_anomalies": "A few single-window anomalies appear by chance in telemetry"
+  },
+  "machine_summary": {
+    "M01": {
+      "role": "CALIBRATION_ONLY",
+      "line": "L1",
+      "lot_at_cutoff": "LOT-412",
+      "oct14_calibration_crew": "CREW-B",
+      "oct14_steps_completed": 7,
+      "scrap_pct_before_calibration": 1.93,
+      "scrap_pct_full_effect_shifts": 2.74,
+      "temp_level_shift_since_calibration": true
+    },
+    "M02": {
+      "role": "AFFECTED",
+      "line": "L1",
+      "lot_at_cutoff": "LOT-409",
+      "oct14_calibration_crew": "CREW-B",
+      "oct14_steps_completed": 7,
+      "scrap_pct_before_calibration": 2.02,
+      "scrap_pct_full_effect_shifts": 12.08,
+      "temp_level_shift_since_calibration": true
+    },
+    "M03": {
+      "role": "AFFECTED",
+      "line": "L1",
+      "lot_at_cutoff": "LOT-409",
+      "oct14_calibration_crew": "CREW-B",
+      "oct14_steps_completed": 7,
+      "scrap_pct_before_calibration": 2.09,
+      "scrap_pct_full_effect_shifts": 12.67,
+      "temp_level_shift_since_calibration": true
+    },
+    "M04": {
+      "role": "LOT409_ONLY",
+      "line": "L1",
+      "lot_at_cutoff": "LOT-409",
+      "oct14_calibration_crew": "CREW-A",
+      "oct14_steps_completed": 8,
+      "scrap_pct_before_calibration": 2.01,
+      "scrap_pct_full_effect_shifts": 1.35,
+      "temp_level_shift_since_calibration": false
+    },
+    "M05": {
+      "role": "NEITHER",
+      "line": "L2",
+      "lot_at_cutoff": "LOT-415",
+      "oct14_calibration_crew": "CREW-A",
+      "oct14_steps_completed": 8,
+      "scrap_pct_before_calibration": 1.9,
+      "scrap_pct_full_effect_shifts": 2.17,
+      "temp_level_shift_since_calibration": false
+    },
+    "M06": {
+      "role": "AFFECTED",
+      "line": "L2",
+      "lot_at_cutoff": "LOT-409",
+      "oct14_calibration_crew": "CREW-B",
+      "oct14_steps_completed": 7,
+      "scrap_pct_before_calibration": 1.88,
+      "scrap_pct_full_effect_shifts": 14.14,
+      "temp_level_shift_since_calibration": true
+    },
+    "M07": {
+      "role": "LOT409_ONLY",
+      "line": "L2",
+      "lot_at_cutoff": "LOT-409",
+      "oct14_calibration_crew": "CREW-A",
+      "oct14_steps_completed": 8,
+      "scrap_pct_before_calibration": 1.93,
+      "scrap_pct_full_effect_shifts": 1.55,
+      "temp_level_shift_since_calibration": false
+    },
+    "M08": {
+      "role": "CALIBRATION_ONLY",
+      "line": "L2",
+      "lot_at_cutoff": "LOT-403",
+      "oct14_calibration_crew": "CREW-B",
+      "oct14_steps_completed": 7,
+      "scrap_pct_before_calibration": 1.95,
+      "scrap_pct_full_effect_shifts": 0.53,
+      "temp_level_shift_since_calibration": true
+    },
+    "M09": {
+      "role": "AFFECTED",
+      "line": "L3",
+      "lot_at_cutoff": "LOT-409",
+      "oct14_calibration_crew": "CREW-B",
+      "oct14_steps_completed": 7,
+      "scrap_pct_before_calibration": 1.99,
+      "scrap_pct_full_effect_shifts": 12.6,
+      "temp_level_shift_since_calibration": true
+    },
+    "M10": {
+      "role": "LOT409_ONLY",
+      "line": "L3",
+      "lot_at_cutoff": "LOT-409",
+      "oct14_calibration_crew": "CREW-A",
+      "oct14_steps_completed": 8,
+      "scrap_pct_before_calibration": 2.02,
+      "scrap_pct_full_effect_shifts": 2.34,
+      "temp_level_shift_since_calibration": false
+    },
+    "M11": {
+      "role": "AFFECTED",
+      "line": "L3",
+      "lot_at_cutoff": "LOT-409",
+      "oct14_calibration_crew": "CREW-B",
+      "oct14_steps_completed": 7,
+      "scrap_pct_before_calibration": 2.16,
+      "scrap_pct_full_effect_shifts": 14.5,
+      "temp_level_shift_since_calibration": true
+    },
+    "M12": {
+      "role": "NEITHER",
+      "line": "L3",
+      "lot_at_cutoff": "LOT-415",
+      "oct14_calibration_crew": "CREW-A",
+      "oct14_steps_completed": 8,
+      "scrap_pct_before_calibration": 1.87,
+      "scrap_pct_full_effect_shifts": 2.31,
+      "temp_level_shift_since_calibration": false
+    }
+  },
+  "blast_radius": {
+    "machines_on_lot_409": [
+      "M02",
+      "M03",
+      "M06",
+      "M09",
+      "M11",
+      "M04",
+      "M07",
+      "M10"
+    ],
+    "lines": [
+      "L1",
+      "L2",
+      "L3"
+    ],
+    "batches_from_lot_409": 137,
+    "units_from_lot_409": 20618,
+    "batches_by_status": {
+      "WIP": 16,
+      "FINISHED": 56,
+      "SHIPPED": 65
+    },
+    "suspect_batches_on_failing_machines_since_effect": 15,
+    "at_risk_but_passing_machines": [
+      "M04",
+      "M07",
+      "M10"
+    ]
+  },
+  "impact_inputs": {
+    "baseline_scrap_rate": 0.02,
+    "excess_scrap_units_so_far": 146,
+    "affected_units_per_day": 2250,
+    "projected_excess_scrap_units_per_day": 270,
+    "assumptions_for_agent": {
+      "unit_cost_usd": 85,
+      "rework_cost_multiplier": 3,
+      "hidden_cost_uplift": 0.5,
+      "downtime_cost_per_hour_usd": 2300000
+    }
+  },
+  "expected_remediation": {
+    "interlock_halt": [
+      "M02",
+      "M03",
+      "M06",
+      "M09",
+      "M11"
+    ],
+    "recalibrate": [
+      "M01",
+      "M02",
+      "M03",
+      "M06",
+      "M08",
+      "M09",
+      "M11"
+    ],
+    "lot_hold": "LOT-409 remaining stock pending hardness verification",
+    "reroute_candidates": [
+      "M05",
+      "M12"
+    ],
+    "human_approval_required_for": [
+      "interlock",
+      "reroute",
+      "lot hold"
+    ]
+  },
+  "agent_test_cases": [
+    {
+      "tool": "common_lots(AFFECTED)",
+      "expect": [
+        "LOT-409"
+      ]
+    },
+    {
+      "tool": "common_crews_oct14(AFFECTED)",
+      "expect": [
+        "CREW-B"
+      ]
+    },
+    {
+      "tool": "cause_intersection()",
+      "expect": {
+        "machines": [
+          "M02",
+          "M03",
+          "M06",
+          "M09",
+          "M11"
+        ],
+        "lot": "LOT-409",
+        "crew": "CREW-B"
+      }
+    },
+    {
+      "tool": "blast_radius('LOT-409')",
+      "expect_machines": [
+        "M02",
+        "M03",
+        "M06",
+        "M09",
+        "M11",
+        "M04",
+        "M07",
+        "M10"
+      ]
+    },
+    {
+      "tool": "supplier_chain('LOT-409')",
+      "expect": [
+        "SUP-T1-01",
+        "SUP-T2-01",
+        "SUP-T3-01"
+      ]
+    }
+  ]
+}

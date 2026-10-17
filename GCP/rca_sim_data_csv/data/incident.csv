@@ -1,0 +1,4 @@
+incident_id,title,status,severity,detected_at,detected_by,metric,baseline_value,observed_value,description,line_ids,closed_at
+INC-2026-1015-001,Scrap spike on precision lines,OPEN,HIGH,2026-10-15T07:15:00Z,scrap-spc-detector,scrap_rate_pct,2.0,13.2,"Scrap rate on 5 machines across L1, L2 and L3 rose about 12 points over baseline within 16 hours; dominant defect DC-205 micro-fracture.",L1;L2;L3,
+INC-2026-0719-002,Surface finish scrap on gear grinder,CLOSED,MEDIUM,2026-07-19T10:00:00Z,quality-engineer,scrap_rate_pct,2.0,6.1,Burr and finish defects on M10.,L3,2026-07-21T16:00:00Z
+INC-2026-0825-003,Dimensional drift on shaft line,CLOSED,MEDIUM,2026-08-25T09:00:00Z,scrap-spc-detector,scrap_rate_pct,2.0,5.4,Bore dimension out of tolerance on L2.,L2,2026-08-27T12:00:00Z

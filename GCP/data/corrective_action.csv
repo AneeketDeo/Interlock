@@ -1,0 +1,3 @@
+corrective_action_id,incident_id,description,status,owner_id
+CA-H1,INC-2026-0719-002,Replace grinding wheel; add wheel-life counter,DONE,EMP-E2
+CA-H2,INC-2026-0825-003,Flush coolant circuit; weekly titration,DONE,EMP-E1

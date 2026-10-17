@@ -1,0 +1,4 @@
+bom_id,product_code,material_id,kg_per_unit
+BOM-GH-118,GH-118,MAT-20MNCR5,7.5
+BOM-OS-210,OS-210,MAT-20MNCR5,4.2
+BOM-GR-330,GR-330,MAT-20MNCR5,3.1

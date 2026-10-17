@@ -1,0 +1,7 @@
+control_plan_id,failure_mode_id,description
+CP-01,FM-01,Incoming hardness verification per heat
+CP-02,FM-02,8-step calibration checklist with sign-off
+CP-03,FM-03,Wheel dressing and tool-life limits
+CP-04,FM-04,Weekly coolant titration
+CP-05,FM-05,Certification matrix review
+CP-06,FM-06,Sensor cross-check against redundant probe

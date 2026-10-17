@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NexusYield AI — Incident Command & HITL Governance</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-obsidian: #07090e; --surface-base: #0f1523; --surface-card: #141c2e;
+  --border-subtle: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8;
+  --ok: #10b981; --bad: #ef4444; --warn: #f59e0b; --accent-blue: #3b82f6;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background-color: var(--bg-obsidian); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+header {
+  display: flex; justify-content: space-between; align-items: center; padding: 16px 36px;
+  background: rgba(15, 21, 35, 0.9); border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 100;
+}
+.brand h1 { font-size: 18px; font-weight: 700; margin: 0; background: linear-gradient(135deg, #60a5fa, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.nav-links { display: flex; gap: 24px; }
+.nav-links a { color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 500; }
+.nav-links a.active { color: var(--text-main); font-weight: 600; border-bottom: 2px solid var(--accent-blue); padding-bottom: 2px; }
+.pill { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid; text-transform: uppercase; }
+.pill.amb { color: #fcd34d; border-color: rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.1); }
+.pill.grn { color: #6ee7b7; border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); }
+
+main { max-width: 1500px; width: 100%; margin: 0 auto; padding: 28px 36px; display: grid; gap: 24px; grid-template-columns: repeat(12, 1fr); flex: 1; }
+.card { background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: 18px; padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+.card h2 { margin: 0 0 16px 0; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+
+.w12 { grid-column: span 12; }
+.hitl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.act-card { border: 1px solid var(--border-subtle); border-radius: 14px; padding: 20px; background: var(--surface-base); display: flex; flex-direction: column; justify-content: space-between; }
+.act-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.act-card p { margin: 8px 0 16px 0; color: var(--text-muted); font-size: 13px; line-height: 1.5; }
+.step-tracker { display: flex; gap: 14px; font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 16px; }
+.step-tracker .active { color: var(--ok); font-weight: 600; }
+
+.action-buttons { display: flex; gap: 10px; }
+button { border: 0; border-radius: 8px; padding: 9px 18px; font-weight: 600; cursor: pointer; font-size: 12px; transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif; }
+button.approve { background: var(--ok); color: #022c22; }
+button.approve:hover { filter: brightness(1.1); }
+button.reject { background: transparent; color: var(--bad); border: 1px solid rgba(239, 68, 68, 0.4); }
+button.reject:hover { background: rgba(239, 68, 68, 0.1); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>NexusYield AI</h1>
+    <div style="font-size:11px; color:var(--text-muted);">Incident Command & HITL Governance</div>
+  </div>
+  <nav class="nav-links">
+    <a href="index.html">1. Executive Analytics</a>
+    <a href="pipelines.html">2. Live Pipelines & SPC</a>
+    <a href="graph.html">3. Spanner Graph Topology</a>
+    <a href="incident.html" class="active">4. Incident Command & HITL</a>
+  </nav>
+  <div><span class="pill amb">AWAITING APPROVAL: INC-2026-1015-001</span></div>
+</header>
+
+<main>
+  <section class="card w12">
+    <h2>Human-in-the-Loop (HITL) Governance Gate (D3 / D5 Remediation)</h2>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Review agent-proposed actions before committing cryptographically to Google Cloud Spanner Graph and triggering downstream plant interlocks.</p>
+    
+    <div class="hitl-grid" id="hitl-container">
+      <!-- Dynamic Action Cards Injected via JS -->
+    </div>
+  </section>
+</main>
+
+<script>
+const ACTIONS = [
+  { action_id: "A1", action_type: "ERP_LOT_QUARANTINE", target_id: "LOT-409", description: "Quarantine WIP and finished goods from LOT-409; hold remaining raw stock in ERP.", status: "PROPOSED" },
+  { action_id: "A2", action_type: "QUALITY_CONTAINMENT_D3", target_id: "SHIPPED_LOT-409_UNITS", description: "Contain 9,840 shipped units; trace and inspect at downstream customer facilities.", status: "PROPOSED" },
+  { action_id: "A3", action_type: "CMMS_RECALIBRATION", target_id: "M02, M03, M06, M09, M11", description: "Dispatch priority CMMS work order to execute mandatory Step 6 thermal offset calibration.", status: "PROPOSED" },
+  { action_id: "A4", action_type: "EQUIPMENT_INTERLOCK", target_id: "CALIBRATION_PROCESS", description: "Engage soft PLC interlock: block machine release until Step 6 is signed off by two authorized personnel.", status: "PROPOSED" }
+];
+
+const $ = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+
+function renderHITL() {
+  const container = document.getElementById("hitl-container");
+  container.replaceChildren();
+
+  ACTIONS.forEach(act => {
+    const box = $("div", "act-card");
+    const top = $("div", "act-top");
+    const statusColor = { PROPOSED: "amb", APPROVED: "grn", REJECTED: "bad" }[act.status] || "grn";
+    
+    top.append($("span", `pill ${statusColor}`, act.status), $("b", 0, act.action_type + " → " + act.target_id));
+    box.append(top, $("p", 0, act.description));
+
+    const tracker = $("div", "step-tracker");
+    ["PROPOSED", "APPROVED", "EXECUTED"].forEach((stepName, idx) => {
+      const curIdx = ["PROPOSED", "APPROVED", "EXECUTED"].indexOf(act.status);
+      const activeClass = curIdx >= idx ? " active" : "";
+      tracker.append($("span", activeClass, (curIdx >= idx ? "● " : "○ ") + stepName));
+    });
+    box.append(tracker);
+
+    if (act.status === "PROPOSED") {
+      const btnRow = $("div", "action-buttons");
+      const btnApprove = $("button", "approve", "Approve & Commit");
+      const btnReject = $("button", "reject", "Reject");
+
+      btnApprove.onclick = () => handleDecision(act, "APPROVED", btnApprove, btnReject);
+      btnReject.onclick = () => handleDecision(act, "REJECTED", btnApprove, btnReject);
+
+      btnRow.append(btnApprove, btnReject);
+      box.append(btnRow);
+    } else {
+      box.append($("div", 0, `Locked state: ${act.status}`)).style = "font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono',monospace;";
+    }
+    container.append(box);
+  });
+}
+
+async function handleDecision(act, outcome, btnApprove, btnReject) {
+  btnApprove.disabled = true; btnReject.disabled = true;
+  const who = prompt("Enter Authorized Engineer ID:", "senior.engineer@plant.com");
+  if (!who) { btnApprove.disabled = false; btnReject.disabled = false; return; }
+
+  try {
+    const res = await fetch(`/api/actions/${encodeURIComponent(act.action_id)}/decision`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ outcome, approver_id: who })
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    act.status = data.status;
+  } catch (e) {
+    // Fallback for local demo mode if FastAPI server isn't running
+    act.status = outcome;
+  }
+  renderHITL();
+}
+
+renderHITL();
+</script>
+</body>
+</html>

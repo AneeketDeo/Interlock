@@ -38,7 +38,19 @@ class Settings(BaseSettings):
     cors_origins: list[str] | str = Field(default_factory=lambda: ["http://localhost:5173"])
     secret_key: str = "change-me-to-a-random-secret-key"
 
-    # ── Neo4j Aura ──────────────────────────────────────────────────
+    # ── Google Cloud Platform ───────────────────────────────────────
+    gcp_project_id: str = "project-a8fa4909-225e-4882-b45"
+    gcp_location: str = "us-central1"
+    spanner_instance_id: str = "rca"
+    spanner_database_id: str = "rca-db"
+    spanner_graph_name: str = "FactoryGraph"
+    pubsub_topic_id: str = "telemetry-ingest-topic"
+    pubsub_subscription_id: str = "telemetry-anomaly-sub"
+    bigquery_dataset: str = "rca_sentinel"
+    bigquery_table: str = "telemetry_historian"
+    use_vertex_ai: bool = True
+
+    # ── Neo4j Aura (Legacy / Fallback) ──────────────────────────────
     neo4j_uri: str = "neo4j+s://localhost:7687"
     neo4j_username: str = "neo4j"
     neo4j_password: str = ""
@@ -46,18 +58,18 @@ class Settings(BaseSettings):
     neo4j_max_connection_pool_size: int = 50
     neo4j_connection_timeout: int = 30
 
-    # ── TimescaleDB ─────────────────────────────────────────────────
+    # ── TimescaleDB (Legacy / Fallback) ─────────────────────────────
     timescale_host: str = "timescaledb"
     timescale_port: int = 5432
     timescale_user: str = "rca"
     timescale_password: str = "rca_password"
     timescale_db: str = "rca_sentinel"
 
-    # ── Redis ───────────────────────────────────────────────────────
+    # ── Redis (Legacy / Fallback) ───────────────────────────────────
     redis_url: str = "redis://redis:6379/0"
     redis_max_connections: int = 20
 
-    # ── Google ADK / Gemini ─────────────────────────────────────────
+    # ── Google ADK / Vertex AI / Gemini ─────────────────────────────
     google_api_key: str = ""
     gemini_model: str = "gemini-2.5-flash"
     gemini_temperature: float = 0.1

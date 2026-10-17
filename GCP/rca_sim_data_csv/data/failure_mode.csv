@@ -1,0 +1,7 @@
+failure_mode_id,category,description,severity,occurrence,detection,rpn
+FM-01,MATERIAL,Raw material hardness/chemistry at spec limit (supplier heat/lot variation),8,3,6,144
+FM-02,METHOD,Calibration step skipped: thermal offset verification not completed,7,4,5,140
+FM-03,MACHINE,Tool or grinding wheel wear beyond limit,6,5,4,120
+FM-04,ENVIRONMENT,Coolant concentration drift or contamination,6,3,5,90
+FM-05,MAN,Operator certification lapsed,5,3,4,60
+FM-06,MEASUREMENT,Sensor drift or spurious reading,4,5,3,60

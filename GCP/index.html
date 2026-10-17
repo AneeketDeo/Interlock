@@ -1,0 +1,71 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NexusYield AI</title>
+<style>
+:root{--bg:#0b0f17;--p:#121826;--p2:#182033;--b:#232e45;--t:#e6ebf5;--m:#8b97b1;--ok:#2dd4a0;--bad:#ff5d6c;--warn:#f5b84b;--acc:#6c8cff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:14px/1.45 system-ui,Segoe UI,Roboto,sans-serif}
+header{display:flex;gap:16px;align-items:center;padding:14px 24px;border-bottom:1px solid var(--b);background:var(--p)}
+header h1{font-size:17px;margin:0}header .sub{color:var(--m);font-size:12px}.sp{flex:1}
+.pill{padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;border:1px solid}
+.red{color:var(--bad);border-color:var(--bad)}.grn{color:var(--ok);border-color:var(--ok)}.amb{color:var(--warn);border-color:var(--warn)}.blu{color:var(--acc);border-color:var(--acc)}
+main{max-width:1280px;margin:0 auto;padding:20px 24px;display:grid;gap:16px;grid-template-columns:repeat(12,1fr)}
+.card{background:var(--p);border:1px solid var(--b);border-radius:12px;padding:16px}.card h2{margin:0 0 12px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--m)}
+.kpi{grid-column:span 3}.kpi .v{font-size:28px;font-weight:700}.kpi .l{color:var(--m);font-size:12px}
+.w7{grid-column:span 7}.w5{grid-column:span 5}.w12{grid-column:span 12}.w6{grid-column:span 6}
+.line{display:flex;gap:10px;align-items:center;margin-bottom:10px}.line .n{width:70px;color:var(--m);font-size:12px}
+.m{flex:1;padding:10px;border-radius:10px;border:1px solid var(--b);background:var(--p2);text-align:center}
+.m b{display:block}.m small{color:var(--m)}.m.AFFECTED{border-color:var(--bad);background:#2a1620}.m.DECOY{border-color:var(--b)}
+.chain{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.node{padding:8px 12px;border-radius:8px;background:var(--p2);border:1px solid var(--b)}
+.node.hot{border-color:var(--bad)}.arr{color:var(--m)}
+.bar{display:flex;align-items:center;gap:10px;margin:8px 0}.bar span{width:210px;color:var(--m);font-size:12px}.bar i{display:block;height:8px;border-radius:4px;background:var(--acc)}.bar em{font-style:normal;font-weight:600}
+.act{border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--p2)}
+.act .top{display:flex;gap:8px;align-items:center;margin-bottom:6px}.act p{margin:6px 0;color:#c5cee0}
+.steps{display:flex;gap:6px;margin:8px 0;font-size:11px;color:var(--m)}.steps .on{color:var(--ok);font-weight:700}
+button{border:0;border-radius:8px;padding:7px 14px;font-weight:600;cursor:pointer;color:#06210f;background:var(--ok)}button.no{background:transparent;color:var(--bad);border:1px solid var(--bad)}button:disabled{opacity:.4;cursor:default}
+.log{font:12px ui-monospace,Menlo,monospace;color:var(--m);max-height:140px;overflow:auto}
+.proof li{margin:6px 0}@media(max-width:900px){.kpi{grid-column:span 6}.w7,.w5,.w6{grid-column:span 12}}
+</style></head><body>
+<header><div><h1>NexusYield AI</h1><div class="sub">Agentic root cause analysis · Spanner Graph · Vertex AI</div></div><div class="sp"></div>
+<span id="src" class="pill blu">…</span><span id="sev" class="pill red"></span><span id="inc" class="sub"></span></header>
+<main id="app"></main>
+<script>
+const SAMPLE={incident:{id:"INC-2026-1015-001",title:"Scrap spike on 5 machines",severity:"HIGH",detected_at:"2026-10-15T07:15Z"},
+machines:[["M01","L1","DECOY",2.74],["M02","L1","AFFECTED",12.08],["M03","L1","AFFECTED",12.67],["M04","L1","DECOY",1.35],["M05","L2","DECOY",2.17],["M06","L2","AFFECTED",14.14],["M07","L2","DECOY",1.55],["M08","L2","DECOY",.53],["M09","L3","AFFECTED",12.6],["M10","L3","DECOY",2.34],["M11","L3","AFFECTED",14.5],["M12","L3","DECOY",2.31]].map(([id,line,role,scrap])=>({id,line,role,scrap})),
+chain:{tiers:["SUP-T3-01","SUP-T2-01","SUP-T1-01"],lot:"LOT-409",crew:"CREW-B",handover:"HO-20261014-S",skipped:"Step 6: Thermal offset verification",classification:"Material & Method Vulnerability",fm:["FM-01 (RPN 144)","FM-02 (RPN 140)"],compound:"FM-07-COMPOUND (RPN 378)"},
+proof:["LOT-409 alone is not the cause: M04, M07, M10 ran it with normal scrap.","Skipped Step 6 alone is not the cause: M01, M08 were miscalibrated with normal scrap.","Only the intersection M02, M03, M06, M09, M11 fails."],
+oee:{before:84.32,after:71.86},blast:{machines:8,batches:137,units:20618,shipped:9840,wip:2385,finished:8393},
+financial:{realized_16h_scrap_and_rework_loss_usd:16702.5,projected_24h_uncontained_scrap_loss_usd:39780,downstream_warranty_recall_exposure_usd:267240,unplanned_line_downtime_avoided_usd:500000,total_value_at_risk_usd:823722.5},
+actions:[{action_id:"A1",action_type:"ERP_LOT_QUARANTINE",target_id:"LOT-409",description:"Quarantine WIP and finished goods from LOT-409; hold remaining raw stock.",status:"PROPOSED"},
+{action_id:"A2",action_type:"QUALITY_CONTAINMENT_D3",target_id:"SHIPPED_LOT-409_UNITS",description:"Contain 9,840 shipped units; trace and inspect at customers.",status:"PROPOSED"},
+{action_id:"A3",action_type:"CMMS_RECALIBRATION",target_id:"M02,M03,M06,M09,M11",description:"Recalibrate including Step 6 thermal offset verification.",status:"PROPOSED"},
+{action_id:"A4",action_type:"EQUIPMENT_INTERLOCK",target_id:"CALIBRATION_PROCESS",description:"CMMS interlock: block job completion until Step 6 is signed off by two people.",status:"PROPOSED"}]};
+const $=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const usd=n=>"$"+Math.round(n).toLocaleString("en-US");const app=document.getElementById("app");let D,live=false;const AUDIT=[];
+function card(cls,title){const c=$("section","card "+cls);if(title)c.append($("h2",0,title));app.append(c);return c}
+function kpi(l,v,cls){const c=card("kpi");c.append($("div","v "+(cls||""),v),$("div","l",l))}
+function render(){app.replaceChildren();const f=D.financial,o=D.oee,b=D.blast;
+document.getElementById("sev").textContent=D.incident.severity;document.getElementById("inc").textContent=D.incident.id+" · "+D.incident.detected_at;
+kpi("Total value at risk",usd(f.total_value_at_risk_usd),"red");kpi("OEE impact",(o.after-o.before).toFixed(2)+" pts ("+o.before+"→"+o.after+"%)","amb");
+kpi("Blast radius",b.machines+" machines · "+b.batches+" batches");kpi("Units exposed",b.units.toLocaleString()+" ("+b.shipped.toLocaleString()+" shipped)");
+let c=card("w7","Fleet topology · red = scrap spike confirmed");for(const L of ["L1","L2","L3"]){const r=$("div","line");r.append($("div","n","Line "+L.slice(1)));
+D.machines.filter(m=>m.line===L).forEach(m=>{const t=$("div","m "+m.role);t.append($("b",0,m.id),$("small",0,m.scrap+"% scrap"));r.append(t)});c.append(r)}
+c.append($("div","sub","Decoys with sensor anomalies but normal scrap were suppressed by the detector and cleared by graph traversal."));
+c=card("w5","Contrastive proof (8D · D4)");const ul=$("ul","proof");D.proof.forEach(p=>ul.append($("li",0,p)));c.append(ul);
+c=card("w12","Causal chain from the Spanner graph");const ch=$("div","chain"),X=D.chain;
+const n=(t,hot)=>$("div","node"+(hot?" hot":""),t),a=()=>$("span","arr","→");
+ch.append(...X.tiers.flatMap((t,i)=>i?[a(),n(t)]:[n("Tier 3 "+t)]));ch.append(a(),n(X.lot,1),a(),n("5 machines",1),$("span","arr","←"),n(X.skipped,1),$("span","arr","←"),n(X.crew+" · "+X.handover,1));c.append(ch);
+const cl=$("div","chain");cl.style.marginTop="12px";cl.append($("span","pill amb",X.classification),...X.fm.map(x=>$("span","pill blu",x)),$("span","pill red","New: "+X.compound));c.append(cl);
+c=card("w6","Financial exposure");const mx=Math.max(...Object.entries(f).filter(([k])=>k!=="total_value_at_risk_usd").map(([,v])=>v));
+Object.entries(f).filter(([k])=>k!=="total_value_at_risk_usd").forEach(([k,v])=>{const r=$("div","bar");const i=$("i");i.style.width=Math.max(4,v/mx*100)+"%";const w=$("div");w.style.cssText="flex:1";w.append(i);r.append($("span",0,k.replace(/_usd$/,"").replace(/_/g," ")),w,$("em",0,usd(v)));c.append(r)});
+c=card("w6","Audit trail");const lg=$("div","log");lg.id="log";lg.textContent=AUDIT.length?AUDIT.join("\n"):"No decisions yet.";c.append(lg);
+c=card("w12","Proposed actions · human approval required (propose → approve → act)");D.actions.forEach(a=>c.append(actCard(a)))}
+function actCard(a){const box=$("div","act"),top=$("div","top");const cls={PROPOSED:"amb",APPROVED:"grn",EXECUTED:"grn",REJECTED:"red"}[a.status]||"blu";
+top.append($("span","pill "+cls,a.status),$("b",0,a.action_type),$("span","sub","→ "+a.target_id));box.append(top,$("p",0,a.description));
+const st=$("div","steps");["PROPOSED","APPROVED","EXECUTED"].forEach((s,i)=>{const on=["PROPOSED","APPROVED","EXECUTED"].indexOf(a.status)>=i;st.append($("span",on?"on":"",(on?"● ":"○ ")+s))});box.append(st);
+if(a.status==="PROPOSED"){const ok=$("button",0,"Approve"),no=$("button","no","Reject");ok.onclick=()=>decide(a,"APPROVED",ok,no);no.onclick=()=>decide(a,"REJECTED",ok,no);box.append(ok," ",no)}return box}
+async function decide(a,outcome,...btns){btns.forEach(b=>b.disabled=true);const who=prompt("Approver ID (e.g. engineer email):","");if(!who){btns.forEach(b=>b.disabled=false);return}
+try{if(live){const r=await fetch("/api/actions/"+encodeURIComponent(a.action_id)+"/decision",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({outcome,approver_id:who})});if(!r.ok)throw new Error(r.status);a.status=(await r.json()).status}else a.status=outcome;
+AUDIT.unshift(new Date().toISOString().slice(0,19)+"Z  "+who+"  "+outcome+"  "+a.action_type+" → "+a.target_id)}catch(e){alert("Decision failed: "+e.message);btns.forEach(b=>b.disabled=false);return}render()}
+function normalize(r){return Object.assign({},SAMPLE,r)} /* TODO: map latest_rca_report.json keys here */
+(async()=>{try{const r=await fetch("/api/report");if(!r.ok)throw 0;D=normalize(await r.json());live=true}catch(e){D=SAMPLE}
+const s=document.getElementById("src");s.textContent=live?"LIVE":"DEMO DATA";s.className="pill "+(live?"grn":"amb");render()})();
+</script></body></html>

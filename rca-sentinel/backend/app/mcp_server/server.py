@@ -34,10 +34,9 @@ settings = get_settings()
 mcp = FastMCP(
     "RCA-Sentinel-MCP",
     instructions=(
-        "MCP server for the RCA-Sentinel manufacturing diagnostic platform. "
-        "Provides tools for multi-hop graph traversal, commonality analysis, "
-        "blast radius computation, financial exposure forecasting, and "
-        "remediation proposal with mandatory human approval gating."
+        "Native Google Cloud MCP server for RCA-Sentinel. Powered by Google Cloud Spanner "
+        "Property Graph (FactoryGraph) with ISO GQL multi-hop graph traversal tools: "
+        "get_machine_subgraph, trace_lot_provenance, and diagnose_root_cause."
     ),
 )
 
