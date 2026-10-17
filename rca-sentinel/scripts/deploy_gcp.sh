@@ -7,7 +7,8 @@ SERVICE_NAME="rca-sentinel-backend"
 SPANNER_INSTANCE="${SPANNER_INSTANCE_ID:-rca-sentinel-graph}"
 SPANNER_DB="${SPANNER_DATABASE_ID:-rca_db}"
 PUBSUB_TOPIC="${PUBSUB_TOPIC_ID:-telemetry-ingest-topic}"
-BQ_DATASET="${BIGQUERY_DATASET:-rca_sentinel}"
+BQ_DATASET="${BIGQUERY_DATASET:-rca_historian}"
+BQ_TABLE="${BIGQUERY_TABLE:-ObservationWindow}"
 
 echo "================================================================="
 echo " Deploying RCA-Sentinel to Google Cloud Run (AI Builder Cup 2026)"
@@ -42,7 +43,7 @@ gcloud run deploy "${SERVICE_NAME}" \
     --cpu=2 \
     --min-instances=1 \
     --max-instances=10 \
-    --set-env-vars="APP_ENV=prod,GCP_PROJECT_ID=${PROJECT_ID},GCP_LOCATION=${REGION},GOOGLE_GENAI_USE_VERTEXAI=true,SPANNER_INSTANCE_ID=${SPANNER_INSTANCE},SPANNER_DATABASE_ID=${SPANNER_DB},SPANNER_GRAPH_NAME=FactoryGraph,PUBSUB_TOPIC_ID=${PUBSUB_TOPIC},BIGQUERY_DATASET=${BQ_DATASET},GEMINI_MODEL=gemini-2.5-flash,DRY_RUN=true" \
+    --set-env-vars="APP_ENV=prod,GCP_PROJECT_ID=${PROJECT_ID},GCP_LOCATION=${REGION},GOOGLE_GENAI_USE_VERTEXAI=true,SPANNER_INSTANCE_ID=${SPANNER_INSTANCE},SPANNER_DATABASE_ID=${SPANNER_DB},SPANNER_GRAPH_NAME=FactoryGraph,PUBSUB_TOPIC_ID=${PUBSUB_TOPIC},BIGQUERY_DATASET=${BQ_DATASET},BIGQUERY_TABLE=${BQ_TABLE},GEMINI_MODEL=gemini-2.5-flash,DRY_RUN=true" \
     --project="${PROJECT_ID}"
 
 # 4. Status Check

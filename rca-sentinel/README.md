@@ -234,8 +234,8 @@ cp .env.example .env
 | `SPANNER_GRAPH_NAME` | `FactoryGraph` | Spanner Property Graph name for ISO GQL |
 | `PUBSUB_TOPIC_ID` | `telemetry-ingest-topic`| Pub/Sub topic for PLC readings |
 | `PUBSUB_SUBSCRIPTION_ID`| `telemetry-anomaly-sub`| Pub/Sub subscription for anomaly worker |
-| `BIGQUERY_DATASET` | `rca_sentinel` | BigQuery historian dataset |
-| `BIGQUERY_TABLE` | `telemetry_historian` | BigQuery historian partitioned table |
+| `BIGQUERY_DATASET` | `rca_historian` | BigQuery historian dataset |
+| `BIGQUERY_TABLE` | `ObservationWindow` | BigQuery historian ObservationWindow table |
 | `USE_VERTEX_AI` | `true` | Routes Google ADK to Vertex AI endpoints |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | LLM model for ADK agents on Vertex AI |
 | `GEMINI_TEMPERATURE` | `0.1` | Agent sampling temperature |

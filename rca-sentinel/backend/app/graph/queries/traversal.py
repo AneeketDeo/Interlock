@@ -52,16 +52,27 @@ class GraphTraversalQueries:
         """ISO GQL multi-hop supplier provenance traversal matching exact FactoryGraph ontology."""
         query = """
         GRAPH FactoryGraph
-        MATCH (target:MaterialLot {id: @lot_id})
-        OPTIONAL MATCH (target_sup:Supplier)-[:SUPPLIED_BY]->(target)
-        RETURN target.id AS target_id,
-               target.lot_number AS target_lot_number,
-               target.material_type AS target_material_type,
-               target.silicon_content_pct AS target_silicon_pct,
-               target.properties AS target_properties,
-               target_sup.id AS target_sup_id,
-               target_sup.name AS target_supplier,
-               target_sup.tier AS target_sup_tier
+        MATCH (target:MaterialLot)
+        WHERE target.lot_id = @lot_id
+        OPTIONAL MATCH (target)-[:SUPPLIED_BY]->(target_sup:Supplier)
+        OPTIONAL MATCH (target)-[:HAS_CERT]->(cert:MillCertificate)
+        OPTIONAL MATCH (upstream_sup:Supplier)-[:SUPPLIES]->(target_sup)
+        RETURN target.lot_id AS lot_id,
+               target.material_id AS material_id,
+               target.qty_kg AS qty_kg,
+               target.status AS status,
+               target_sup.supplier_id AS supplier_id,
+               target_sup.name AS supplier_name,
+               target_sup.tier AS supplier_tier,
+               cert.mill_cert_id AS mill_cert_id,
+               cert.heat_number AS heat_number,
+               cert.hardness_hrc AS hardness_hrc,
+               cert.carbon_pct AS carbon_pct,
+               cert.within_spec AS cert_within_spec,
+               cert.edge_flag AS cert_edge_flag,
+               upstream_sup.supplier_id AS upstream_supplier_id,
+               upstream_sup.name AS upstream_supplier_name,
+               upstream_sup.tier AS upstream_supplier_tier
         """
         records = await self.client.execute_gql(
             query,
@@ -72,34 +83,39 @@ class GraphTraversalQueries:
             return {"target_lot": None, "upstream_lots": [], "total_hops": 0}
 
         first = records[0]
-        target_props = first.get("target_properties")
-        if isinstance(target_props, str):
-            try:
-                target_props = json.loads(target_props)
-            except Exception:
-                pass
-        if not target_props and first.get("target_silicon_pct") is not None:
-            target_props = {"silicon_content_pct": first.get("target_silicon_pct")}
-
-        target_lot = {
-            "id": first.get("target_id"),
-            "lot_number": first.get("target_lot_number"),
-            "material_type": first.get("target_material_type"),
-            "properties": target_props,
-            "supplier": {
-                "id": first.get("target_sup_id"),
-                "name": first.get("target_supplier"),
-                "tier": first.get("target_sup_tier"),
-            } if first.get("target_supplier") else None,
+        cert_props = {
+            "hardness_hrc": first.get("hardness_hrc"),
+            "carbon_pct": first.get("carbon_pct"),
+            "within_spec": first.get("cert_within_spec"),
+            "edge_flag": first.get("cert_edge_flag"),
+            "heat_number": first.get("heat_number"),
         }
 
-        upstream_lots = []
-        seen = set()
-        for r in records:
-            uid = r.get("target_id")
-            if uid and uid not in seen:
-                seen.add(uid)
-                upstream_lots.append(target_lot)
+        target_lot = {
+            "id": first.get("lot_id"),
+            "lot_id": first.get("lot_id"),
+            "material_id": first.get("material_id"),
+            "qty_kg": first.get("qty_kg"),
+            "status": first.get("status"),
+            "properties": cert_props,
+            "mill_certificate": cert_props,
+            "supplier": {
+                "id": first.get("supplier_id"),
+                "name": first.get("supplier_name"),
+                "tier": first.get("supplier_tier"),
+            } if first.get("supplier_name") else None,
+        }
+
+        upstream_lots = [target_lot]
+        if first.get("upstream_supplier_id"):
+            upstream_lots.append({
+                "id": f"lot-upstream-{first.get('upstream_supplier_id')}",
+                "supplier": {
+                    "id": first.get("upstream_supplier_id"),
+                    "name": first.get("upstream_supplier_name"),
+                    "tier": first.get("upstream_supplier_tier"),
+                },
+            })
 
         return {
             "target_lot": target_lot,
@@ -137,23 +153,29 @@ class GraphTraversalQueries:
         return await self._get_machine_subgraph_neo4j(machine_id)
 
     async def _get_machine_subgraph_spanner(self, machine_id: str) -> dict[str, Any]:
-        """ISO GQL machine subgraph query using exact ontology labels."""
+        """ISO GQL machine subgraph query using exact ontology labels from spanner_schema_backup.sql."""
         query = """
         GRAPH FactoryGraph
-        MATCH (m:Machine {id: @machine_id})
-        OPTIONAL MATCH (s:Sensor)
-        OPTIONAL MATCH (ml:MaterialLot)-[:PROCESSED_ON]->(m)
-        OPTIONAL MATCH (sup:Supplier)-[:SUPPLIED_BY]->(ml)
-        OPTIONAL MATCH (crew:Crew)-[:MAINTAINED_BY]->(m)
+        MATCH (m:Machine)
+        WHERE m.machine_id = @machine_id
+        OPTIONAL MATCH (m)-[:HAS_SENSOR]->(s:Sensor)
+        OPTIONAL MATCH (m)-[:PROCESSED]->(lot:MaterialLot)
+        OPTIONAL MATCH (lot)-[:SUPPLIED_BY]->(sup:Supplier)
+        OPTIONAL MATCH (lot)-[:HAS_CERT]->(cert:MillCertificate)
         OPTIONAL MATCH (cal:Calibration)-[:CALIBRATED]->(m)
-        RETURN m.id AS machine_id, m.name AS machine_name, m.code AS machine_code, m.machine_type AS machine_type,
-               s.id AS sensor_id, s.tag AS sensor_tag, s.sensor_type AS sensor_type,
-               ml.id AS ml_id, ml.lot_number AS ml_lot_number, ml.material_type AS ml_material_type,
-               ml.silicon_content_pct AS ml_silicon_pct, ml.properties AS ml_props,
-               sup.id AS sup_id, sup.name AS sup_name, sup.tier AS sup_tier,
-               crew.id AS crew_id, crew.name AS crew_name, crew.shift AS crew_shift,
-               cal.id AS cal_id, cal.offset_mm AS calibration_offset_mm, cal.tolerance_mm AS tolerance_limit_mm,
-               cal.status AS cal_status, cal.notes AS cal_notes, cal.timestamp AS cal_timestamp
+        OPTIONAL MATCH (cal)-[:DURING_HANDOVER]->(h:Handover)
+        OPTIONAL MATCH (h)-[:HANDOVER_FROM]->(crew:Crew)
+        RETURN m.machine_id AS machine_id, m.name AS machine_name, m.machine_type AS machine_type, m.line_id AS line_id,
+               s.sensor_id AS sensor_id, s.sensor_type AS sensor_type, s.unit AS sensor_unit,
+               lot.lot_id AS lot_id, lot.material_id AS material_id, lot.status AS lot_status,
+               sup.supplier_id AS supplier_id, sup.name AS supplier_name, sup.tier AS supplier_tier,
+               cert.mill_cert_id AS mill_cert_id, cert.within_spec AS cert_within_spec, cert.edge_flag AS cert_edge_flag,
+               cal.calibration_id AS calibration_id, cal.steps_required AS steps_required,
+               cal.steps_completed AS steps_completed, cal.skipped_step AS skipped_step,
+               cal.duration_min AS duration_min, cal.verification_signed_off AS verification_signed_off,
+               cal.recorded_result AS recorded_result,
+               h.handover_id AS handover_id, h.rushed AS handover_rushed, h.notes AS handover_notes,
+               crew.crew_id AS crew_id, crew.name AS crew_name
         """
         records = await self.client.execute_gql(
             query,
@@ -166,9 +188,10 @@ class GraphTraversalQueries:
         first = records[0]
         machine = {
             "id": first.get("machine_id"),
+            "machine_id": first.get("machine_id"),
             "name": first.get("machine_name"),
-            "code": first.get("machine_code"),
             "machine_type": first.get("machine_type"),
+            "line_id": first.get("line_id"),
         }
 
         sensors = []
@@ -182,46 +205,51 @@ class GraphTraversalQueries:
                 seen_s.add(r["sensor_id"])
                 sensors.append({
                     "id": r["sensor_id"],
-                    "tag": r.get("sensor_tag"),
+                    "tag": r.get("sensor_id"),
                     "sensor_type": r.get("sensor_type"),
+                    "unit": r.get("sensor_unit"),
                 })
-            if r.get("cal_id") and r["cal_id"] not in seen_cal:
-                seen_cal.add(r["cal_id"])
+            if r.get("calibration_id") and r["calibration_id"] not in seen_cal:
+                seen_cal.add(r["calibration_id"])
                 maintenance.append({
-                    "id": r["cal_id"],
+                    "id": r["calibration_id"],
                     "title": f"Calibration on {r.get('machine_name', machine_id)}",
-                    "calibration_offset_mm": r.get("calibration_offset_mm"),
-                    "tolerance_limit_mm": r.get("tolerance_limit_mm"),
-                    "status": r.get("cal_status"),
-                    "notes": r.get("cal_notes"),
-                    "timestamp": str(r.get("cal_timestamp")),
+                    "steps_required": r.get("steps_required"),
+                    "steps_completed": r.get("steps_completed"),
+                    "skipped_step": r.get("skipped_step"),
+                    "duration_min": r.get("duration_min"),
+                    "verification_signed_off": r.get("verification_signed_off"),
+                    "recorded_result": r.get("recorded_result"),
                     "crew_name": r.get("crew_name"),
+                    "handover_rushed": r.get("handover_rushed"),
                 })
             if r.get("crew_id") and r["crew_id"] not in seen_crew:
                 seen_crew.add(r["crew_id"])
                 logs.append({
                     "id": r["crew_id"],
                     "crew_name": r.get("crew_name"),
-                    "shift": r.get("crew_shift"),
-                    "text": f"Shift {r.get('crew_shift')} maintenance handover by {r.get('crew_name')}",
+                    "text": r.get("handover_notes") or f"Handover notes for {r.get('crew_name')}",
+                    "rushed": r.get("handover_rushed"),
                 })
-            if r.get("ml_id") and r["ml_id"] not in seen_ml:
-                seen_ml.add(r["ml_id"])
+            if r.get("lot_id") and r["lot_id"] not in seen_ml:
+                seen_ml.add(r["lot_id"])
                 lots.append({
-                    "id": r["ml_id"],
-                    "lot_number": r.get("ml_lot_number"),
-                    "material_type": r.get("ml_material_type"),
-                    "silicon_content_pct": r.get("ml_silicon_pct"),
+                    "id": r["lot_id"],
+                    "lot_id": r.get("lot_id"),
+                    "material_id": r.get("material_id"),
+                    "status": r.get("lot_status"),
+                    "mill_cert_id": r.get("mill_cert_id"),
+                    "within_spec": r.get("cert_within_spec"),
                     "supplier": {
-                        "id": r.get("sup_id"),
-                        "name": r.get("sup_name"),
-                        "tier": r.get("sup_tier"),
+                        "id": r.get("supplier_id"),
+                        "name": r.get("supplier_name"),
+                        "tier": r.get("supplier_tier"),
                     },
                 })
 
         return {
             "machine": machine,
-            "line": {"id": "line-03", "name": "Assembly Line 03"},
+            "line": {"id": first.get("line_id", "line-03"), "name": "Assembly Line 03"},
             "sensors": sensors,
             "maintenance_events": maintenance,
             "operator_logs": logs,
@@ -259,18 +287,23 @@ class GraphTraversalQueries:
         if isinstance(self.client, SpannerGraphClient):
             query = """
             GRAPH FactoryGraph
-            MATCH (cal:Calibration)-[:CALIBRATED]->(m:Machine {id: @machine_id})
-            OPTIONAL MATCH (crew:Crew)-[:MAINTAINED_BY]->(m)
-            RETURN cal.id AS id,
-                   cal.offset_mm AS calibration_offset_mm,
-                   cal.tolerance_mm AS tolerance_limit_mm,
-                   cal.status AS status,
-                   cal.notes AS notes,
-                   cal.timestamp AS timestamp,
-                   crew.id AS crew_id,
-                   crew.name AS crew_name,
-                   crew.shift AS shift
-            ORDER BY cal.timestamp DESC
+            MATCH (cal:Calibration)-[:CALIBRATED]->(m:Machine)
+            WHERE m.machine_id = @machine_id
+            OPTIONAL MATCH (cal)-[:DURING_HANDOVER]->(h:Handover)
+            OPTIONAL MATCH (h)-[:HANDOVER_FROM]->(crew:Crew)
+            RETURN cal.calibration_id AS id,
+                   cal.steps_required AS steps_required,
+                   cal.steps_completed AS steps_completed,
+                   cal.skipped_step AS skipped_step,
+                   cal.duration_min AS duration_min,
+                   cal.recorded_result AS recorded_result,
+                   cal.verification_signed_off AS verification_signed_off,
+                   cal.started_at AS timestamp,
+                   h.rushed AS handover_rushed,
+                   h.notes AS handover_notes,
+                   crew.crew_id AS crew_id,
+                   crew.name AS crew_name
+            ORDER BY cal.started_at DESC
             LIMIT @limit
             """
             return await self.client.execute_gql(
@@ -301,13 +334,16 @@ class GraphTraversalQueries:
         if isinstance(self.client, SpannerGraphClient):
             query = """
             GRAPH FactoryGraph
-            MATCH (crew:Crew)-[:MAINTAINED_BY]->(m:Machine {id: @machine_id})
-            RETURN crew.id AS id,
-                   crew.name AS name,
-                   crew.shift AS shift_number,
-                   crew.notes AS text,
-                   crew.timestamp AS timestamp
-            ORDER BY crew.timestamp DESC
+            MATCH (cal:Calibration)-[:CALIBRATED]->(m:Machine)
+            WHERE m.machine_id = @machine_id
+            MATCH (cal)-[:DURING_HANDOVER]->(h:Handover)
+            OPTIONAL MATCH (h)-[:HANDOVER_FROM]->(crew:Crew)
+            RETURN h.handover_id AS id,
+                   h.notes AS text,
+                   h.rushed AS rushed,
+                   h.handover_time AS timestamp,
+                   crew.name AS crew_name
+            ORDER BY h.handover_time DESC
             LIMIT @limit
             """
             return await self.client.execute_gql(

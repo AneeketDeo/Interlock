@@ -46,8 +46,8 @@ class Settings(BaseSettings):
     spanner_graph_name: str = "FactoryGraph"
     pubsub_topic_id: str = "telemetry-ingest-topic"
     pubsub_subscription_id: str = "telemetry-anomaly-sub"
-    bigquery_dataset: str = "rca_sentinel"
-    bigquery_table: str = "telemetry_historian"
+    bigquery_dataset: str = "rca_historian"
+    bigquery_table: str = "ObservationWindow"
     use_vertex_ai: bool = True
 
     # ── Neo4j Aura (Legacy / Fallback) ──────────────────────────────
