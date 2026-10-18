@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   ReactFlow,
   Background,
@@ -289,12 +289,34 @@ const INITIAL_EDGES: Edge[] = [
 
 interface EvidenceGraphProps {
   onSelectNode: (nodeData: GraphNodeData) => void;
+  nodes?: Node<GraphNodeData>[];
+  edges?: Edge[];
+  customNodes?: Node<GraphNodeData>[];
+  customEdges?: Edge[];
+  isLoading?: boolean;
 }
 
-export function EvidenceGraph({ onSelectNode }: EvidenceGraphProps) {
-  const [nodes, setNodes] = useState<Node<GraphNodeData>[]>(INITIAL_NODES);
-  const [edges] = useState<Edge[]>(INITIAL_EDGES);
+export function EvidenceGraph({
+  onSelectNode,
+  nodes: propNodes,
+  edges: propEdges,
+  customNodes,
+  customEdges,
+  isLoading,
+}: EvidenceGraphProps) {
+  const activeNodes = customNodes || propNodes;
+  const activeEdges = customEdges || propEdges;
+  const [nodes, setNodes] = useState<Node<GraphNodeData>[]>(activeNodes || INITIAL_NODES);
+  const [edges, setEdges] = useState<Edge[]>(activeEdges || INITIAL_EDGES);
   const [dimDecoys, setDimDecoys] = useState(false);
+
+  useEffect(() => {
+    if (activeNodes) setNodes(activeNodes);
+  }, [activeNodes]);
+
+  useEffect(() => {
+    if (activeEdges) setEdges(activeEdges);
+  }, [activeEdges]);
 
   const nodeTypes = useMemo(() => ({ evidenceNode: EvidenceNodeRenderer }), []);
 
@@ -322,12 +344,21 @@ export function EvidenceGraph({ onSelectNode }: EvidenceGraphProps) {
   };
 
   const resetLayout = () => {
-    setNodes(INITIAL_NODES);
+    setNodes(customNodes || INITIAL_NODES);
+    setEdges(customEdges || INITIAL_EDGES);
     setDimDecoys(false);
   };
 
   return (
     <div className="relative h-[480px] w-full bg-canvas border border-subtle rounded-md overflow-hidden">
+      {isLoading && (
+        <div className="absolute inset-0 z-20 bg-canvas/80 flex items-center justify-center backdrop-blur-sm">
+          <div className="flex items-center gap-2 text-xs font-mono text-cobalt">
+            <div className="h-4 w-4 border-2 border-cobalt border-t-transparent rounded-full animate-spin" />
+            <span>Querying Cloud Spanner ISO GQL...</span>
+          </div>
+        </div>
+      )}
       {/* Floating Toolbar Controls */}
       <div className="absolute top-3 left-3 z-10 flex items-center gap-2 bg-panel/90 border border-subtle px-3 py-1.5 rounded backdrop-blur-sm text-xs font-mono shadow-md">
         <button

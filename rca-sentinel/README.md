@@ -254,68 +254,117 @@ cp .env.example .env
 
 ## 9. Quick Start
 
-### 1. Launch Services
-Start all containers in detached mode:
-```bash
-make up
-```
-This builds and boots:
-- `rca-timescaledb` on `:5432`
-- `rca-redis` on `:6379`
-- `rca-api` on `:8000`
-- `rca-mcp-server` on `:8001`
-- `rca-worker` (stream detection consumer)
-- `rca-frontend` on `:5173`
+### Prerequisites
+- **Python**: `>=3.11` (managed via [`uv`](https://github.com/astral-sh/uv))
+- **Node.js**: `>=18` & `npm`
+- **Google Cloud Platform**: Active GCP credentials with access to Spanner instance `rca` (DB: `rca-db`, Graph: `FactoryGraph`), BigQuery dataset `rca_historian`, and Pub/Sub topic `telemetry-ingest-topic`.
 
-### 2. Seed Ontology & Synthetic Data
-Apply Neo4j uniqueness constraints, parse OWL ontology files, run SHACL validation, and ingest the baseline factory topology and golden scenario records:
+---
+
+### Option A: Local Development (Cross-Platform / Windows PowerShell / macOS / Linux)
+
+Run microservices natively in parallel terminal tabs (no Docker or `make` required):
+
+#### 1. Start the FastAPI Backend
 ```bash
-make seed
+# Windows PowerShell / CMD / Bash:
+cd backend
+uv sync
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+*API Swagger Docs will be available at [http://localhost:8000/docs](http://localhost:8000/docs)*
+
+#### 2. Start the FastMCP Tooling Server
+```bash
+# In a second terminal tab:
+cd backend
+uv run python -m app.mcp_server.server
+```
+*FastMCP SSE endpoint runs on [http://localhost:8001](http://localhost:8001)*
+
+#### 3. Start the Telemetry & Anomaly Worker (Pub/Sub & BigQuery)
+```bash
+# In a third terminal tab:
+cd backend
+uv run python -m app.detection.stream_consumer
+```
+*Subscribes to Pub/Sub `telemetry-anomaly-sub`, runs statistical detectors (EWMA/CUSUM), and micro-batches to BigQuery `rca_historian.ObservationWindow`.*
+
+#### 4. Start the React 18 Console Frontend
+```bash
+# In a fourth terminal tab:
+cd frontend
+npm install
+npm run dev
+```
+> **Note for Windows PowerShell users:** If script execution policies block `npm.ps1`, run `npm.cmd install` and `npm.cmd run dev`.
+
+*Frontend UI will be live at [http://localhost:5173](http://localhost:5173)*
+
+---
+
+### Option B: Containerized Execution via Docker Compose
+
+If you have Docker Desktop installed, you can launch all services directly with `docker compose` (no `make` utility needed):
+
+```bash
+# Build and run all microservices in detached mode
+docker compose up -d --build
+
+# Inspect real-time logs across services
+docker compose logs -f
+
+# Shutdown and remove containers
+docker compose down
 ```
 
-### 3. Access Interfaces
-- **API Swagger Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs)
-- **FastMCP Server**: [http://localhost:8001](http://localhost:8001)
-- **Frontend Console**: [http://localhost:5173](http://localhost:5173)
+---
+
+### Option C: Production Deployment to Google Cloud Run
+
+Deploy directly to Google Cloud Platform using the automated deployment script:
+
+```bash
+# Set your active GCP project (if not already set)
+gcloud config set project project-a8fa4909-225e-4882-b45
+
+# Execute the deployment script
+bash scripts/deploy_gcp.sh
+```
+
+---
+
+### Access Interfaces
+- **Frontend Operational Console**: [http://localhost:5173](http://localhost:5173)
+- **FastAPI OpenAPI Swagger**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **FastMCP Tooling Interface**: [http://localhost:8001](http://localhost:8001)
+- **Google Cloud Spanner Graph**: `project-a8fa4909-225e-4882-b45` &rarr; `rca` &rarr; `rca-db` &rarr; `FactoryGraph`
+- **Google BigQuery Historian**: `project-a8fa4909-225e-4882-b45` &rarr; `rca_historian.ObservationWindow`
 
 ---
 
 ## 10. Development & Testing Commands
 
-All standard operations are wrapped via `Makefile`:
+Run testing, linting, and quality gates directly using `uv` and `npm` without `make`:
 
 ```bash
-# Infrastructure
-make up          # Start all Docker services
-make down        # Stop containers and remove volumes
-make logs        # Tail Docker logs across all containers
-
-# Data Management
-make seed        # Bootstrap graph constraints, ontology & generate synthetic data
-make replay      # Replay the golden scenario telemetry stream
-
-# Backend Code Quality
-make lint        # Run ruff linter and format check
-make format      # Auto-format and fix lint errors
-make typecheck   # Run mypy --strict on backend
-make test        # Run pytest unit test suite
-make test-cov    # Run pytest with code coverage report
-make check       # Execute lint, typecheck, and test sequentially
-
-# Frontend Code Quality
-make fe-dev      # Run frontend in local Vite dev mode
-make fe-build    # Compile frontend production bundle
-make fe-test     # Run Vitest frontend test suite
-make fe-lint     # Run ESLint on frontend
-
-# Housekeeping
-make clean       # Remove caches and shutdown containers
-```
-
-To run backend tests locally without Docker:
-```bash
+# ── Backend Unit & Integration Tests ──────────────────────────────────────────
 cd backend
-uv run pytest tests/ -v
+uv run pytest -v                                # Run all 96 unit tests across all 5 phases
+uv run pytest tests/unit/test_phase4.py -v       # Test Spanner Graph traversals & backward RCA
+uv run pytest tests/unit/test_gcp_pipeline.py -v # Test BigQuery ObservationWindow streaming
+uv run pytest --cov=app tests/                  # Run tests with code coverage report
+
+# ── Backend Code Quality ──────────────────────────────────────────────────────
+uv run ruff check app/ tests/                   # Run Ruff linter
+uv run ruff format --check app/ tests/          # Verify formatting compliance
+uv run mypy app/                                # Run static type checking
+
+# ── Frontend Quality & Build ──────────────────────────────────────────────────
+cd ../frontend
+npm run test                                    # Run Vitest test suite
+npm run build                                   # Compile production bundle with Vite & TypeScript
+npm run lint                                    # Run ESLint on TypeScript & React code
 ```
 
 ---

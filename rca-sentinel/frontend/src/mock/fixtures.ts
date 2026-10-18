@@ -318,7 +318,7 @@ export const GOLDEN_EVIDENCE_PACKAGE: IncidentEvidence[] = [
     category: 'operational',
     confidence: 0.94,
     liftScore: 6.20,
-    sourceSystem: 'Neo4j Multi-Hop Graph Traversal',
+    sourceSystem: 'Google Cloud Spanner Graph (FactoryGraph)',
     sourceRecordId: 'GRAPH-TRAVERSAL-PATH-8921',
     evidenceHash: '1a2b3c4d5e6f7a8b9c0d1e2f3a8f9a2b71c4d5e89a0b1c2d3e4f5a6b7c8d9e0f',
     description: 'Hard alloy workpiece (Lot #40921) encountering eccentric spindle (0.035mm offset) exponentially increased cutting friction, generating 78.4C thermal spindle warp within 12 minutes.',

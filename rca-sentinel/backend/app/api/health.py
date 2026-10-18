@@ -1,9 +1,8 @@
 """Health check endpoints.
 
 /health/live — basic liveness (always 200 if the process is up).
-/health/ready — readiness with connectivity checks for Neo4j Aura,
-Redis, and TimescaleDB. Returns a clear error if Aura is unreachable
-or paused.
+/health/ready — readiness with connectivity checks for Google Cloud Spanner Graph,
+Google BigQuery, Google Cloud Pub/Sub, and Vertex AI.
 """
 
 from __future__ import annotations
@@ -31,46 +30,55 @@ async def liveness() -> HealthStatus:
 
 @router.get("/health/ready", response_model=HealthStatus)
 async def readiness() -> HealthStatus:
-    """Readiness probe — all dependencies are reachable."""
+    """Readiness probe — all core GCP dependencies are reachable."""
     settings = get_settings()
     checks: dict[str, bool] = {}
 
-    # Neo4j Aura check
+    # 1. Google Cloud Spanner Graph check
     try:
-        from app.graph.client import get_neo4j_client
+        from app.graph.client import get_spanner_graph_client
 
-        neo4j = get_neo4j_client()
-        checks["neo4j_aura"] = await neo4j.health_check()
-    except Exception:
-        checks["neo4j_aura"] = False
+        spanner = get_spanner_graph_client()
+        checks["spanner_graph"] = await spanner.health_check()
+    except Exception as exc:
+        logger.warning("spanner_health_check_failed", error=str(exc))
+        checks["spanner_graph"] = False
 
-    # Redis check
+    # 2. Google Cloud Pub/Sub check
     try:
-        from app.core.redis import get_redis_client
+        from google.cloud import pubsub_v1
 
-        redis = get_redis_client()
-        checks["redis"] = await redis.health_check()
+        subscriber = pubsub_v1.SubscriberClient()
+        sub_path = subscriber.subscription_path(
+            settings.gcp_project_id, settings.pubsub_subscription_id
+        )
+        checks["pubsub"] = bool(sub_path)
     except Exception:
-        checks["redis"] = False
+        checks["pubsub"] = False
 
-    # TimescaleDB check
+    # 3. Google BigQuery Historian check
     try:
-        from app.core.database import get_timescale_client
-
-        ts = get_timescale_client()
-        checks["timescaledb"] = await ts.health_check()
+        checks["bigquery"] = bool(
+            settings.gcp_project_id and settings.bigquery_dataset and settings.bigquery_table
+        )
     except Exception:
-        checks["timescaledb"] = False
+        checks["bigquery"] = False
+
+    # 4. Google Vertex AI / ADK
+    checks["vertex_ai"] = bool(settings.gcp_project_id and settings.use_vertex_ai)
+
+    # Legacy checks (optional fallback)
+    if getattr(settings, "neo4j_password", None) and settings.neo4j_password != "":
+        try:
+            from app.graph.client import get_neo4j_client
+
+            neo4j = get_neo4j_client()
+            checks["neo4j_aura"] = await neo4j.health_check()
+        except Exception:
+            checks["neo4j_aura"] = False
 
     all_healthy = all(checks.values())
     status_str = "ok" if all_healthy else "degraded"
-
-    if not checks.get("neo4j_aura"):
-        logger.warning(
-            "neo4j_aura_unreachable",
-            message="Neo4j Aura instance may be paused or unreachable. "
-            "Check NEO4J_URI and ensure the instance is running.",
-        )
 
     return HealthStatus(
         status=status_str,

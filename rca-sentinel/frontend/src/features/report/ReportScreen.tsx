@@ -2,49 +2,67 @@ import { Printer } from 'lucide-react';
 import { useAppStore } from '../../state/useAppStore';
 
 export function ReportScreen() {
-  const { activeCase, timelineStage } = useAppStore();
+  const { activeCase, timelineStage, dataMode } = useAppStore();
+
+  const isLive = dataMode === 'live';
 
   const dSteps = [
     {
       step: 'D1: TEAM FORMATION',
       title: 'Multidisciplinary RCA Response Team',
-      content: 'Champion: Plant Director J. Martinez; Lead: M. Vance (PE Reliability); Quality: S. Chen (QE); Operations: Line 03 Shift Supervisor.',
+      content: 'Champion: Plant Director J. Martinez; Lead: M. Vance (PE Reliability); Quality: S. Chen (QE); Operations: Lines L1, L2, L3 Machining Supervisors.',
       status: 'complete',
     },
     {
       step: 'D2: PROBLEM DESCRIPTION',
-      title: 'Scrap Rate Spike (12.2%) on Precision Spindle Station-03b',
-      content: 'At 22:01 UTC, vibration telemetry reached 4.82 mm/s with 78.4°C spindle thermal warp. 42 consecutive cycles failed CMM tolerance check on Line 03.',
+      title: isLive
+        ? 'Scrap Rate Spike (11.8%) on CNC Milling Centers (M02, M03, M06, M09, M11)'
+        : 'Scrap Rate Spike (12.2%) on Precision Spindle Station-03b',
+      content: isLive
+        ? 'Dimensional defect spike of 11.8% confirmed across 5 CNC milling centers spanning Lines L1, L2, and L3. Workpieces failed automated CMM inspection gate.'
+        : 'At 22:01 UTC, vibration telemetry reached 4.82 mm/s with 78.4°C spindle thermal warp. 42 consecutive cycles failed CMM tolerance check on Line 03.',
       status: 'complete',
     },
     {
       step: 'D3: INTERIM CONTAINMENT ACTIONS',
-      title: 'Emergency Feed Hold Interlock & Buffer Reroute',
-      content: 'Interlock placed on Station-03b; 420 contaminated assemblies quarantined at CMM gate. Feeder rerouted to Verified Buffer Lot #40889.',
+      title: isLive
+        ? 'Emergency Feed Hold on M02, M03, M06, M09, M11 & Buffer Reroute to LOT-377'
+        : 'Emergency Feed Hold Interlock & Buffer Reroute',
+      content: isLive
+        ? 'Emergency PLC feed-hold placed on affected CNC centers; LOT-409 placed on ERP quality hold. Feeder lines rerouted to Verified Buffer Lot LOT-377 (Helix Powertrain).'
+        : 'Interlock placed on Station-03b; 420 contaminated assemblies quarantined at CMM gate. Feeder rerouted to Verified Buffer Lot #40889.',
       status: timelineStage >= 7 ? 'complete' : 'in_progress',
     },
     {
       step: 'D4: ROOT CAUSE ANALYSIS',
-      title: 'Compound Cause: High-Silicon Lot #40921 + Skipped Calibration',
-      content: '1) AlloyTech Global Tier-3 Lot #40921 contained 1.82% silicon (+34.8% over ceiling). 2) Maintenance Crew B skipped dial-indicator dynamic tramming during rushed 4-min handover (0.035mm offset).',
+      title: isLive
+        ? 'Compound Cause: Upper-Edge Hardness Lot LOT-409 + Crew A Skipped Calibration'
+        : 'Compound Cause: High-Silicon Lot #40921 + Skipped Calibration',
+      content: isLive
+        ? '1) Tier-3 steel lot LOT-409 (Apex Drivetrain / Meridian Specialty Steels) was within nominal spec but at upper edge on hardness (31.7 HRC) and carbon (0.219%). 2) Maintenance Crew A rushed shift handover HO-20261014-S (6.0 mins), skipping Step 6: Thermal offset verification (CAL-0021..CAL-0027). The compound interaction generated tool chatter and uncompensated thermal drift.'
+        : '1) AlloyTech Global Tier-3 Lot #40921 contained 1.82% silicon (+34.8% over ceiling). 2) Maintenance Crew B skipped dial-indicator dynamic tramming during rushed 4-min handover (0.035mm offset).',
       status: 'complete',
     },
     {
       step: 'D5: PERMANENT CORRECTIVE ACTIONS',
-      title: 'Quarantine Supplier Lot & Emergency Dynamic Spindle Tramming',
-      content: 'Global quality hold placed on Vendor-8812 (AlloyTech). Priority CMMS work order WO-9921 dispatched to Crew A for spindle realignment to ±0.005mm.',
+      title: isLive
+        ? 'ERP Quarantine of LOT-409 & Priority Thermal Offset Recalibration'
+        : 'Quarantine Supplier Lot & Emergency Dynamic Spindle Tramming',
+      content: isLive
+        ? 'Global quality block placed on Lot LOT-409. Priority CMMS work order MO-0028 dispatched to Crew B to execute Step 6 dynamic thermal offset verification on all affected centers.'
+        : 'Global quality hold placed on Vendor-8812 (AlloyTech). Priority CMMS work order WO-9921 dispatched to Crew A for spindle realignment to ±0.005mm.',
       status: timelineStage >= 7 ? 'complete' : 'pending',
     },
     {
       step: 'D6: IMPLEMENT & VALIDATE PCA',
       title: 'Spindle Runout Verification & Test Run',
-      content: 'Verify dial indicator runout ≤ ±0.010mm before restarting Line 03. Execute 50-part pilot run with CMM 100% inspection.',
+      content: 'Verify thermal offset indicators <= +-0.010mm before clearing machines for production. Execute 50-part pilot run with 100% CMM inspection.',
       status: 'pending',
     },
     {
       step: 'D7: PREVENT RECURRENCE',
-      title: 'Automated Handover Gate & Inbound XRF Testing',
-      content: 'Enforce mandatory 15-minute electronic shift handover signoff in CMMS. Add automated handheld XRF silicon spectroscopy check at receiving dock.',
+      title: 'Automated Handover Gate & Inbound Hardness Testing',
+      content: 'Enforce mandatory 15-minute electronic shift handover signoff in CMMS. Add automated hardness/carbon verification for Tier-3 steel deliveries.',
       status: 'pending',
     },
     {
@@ -71,7 +89,7 @@ export function ReportScreen() {
             8D Corrective Action Report &bull; #{activeCase.id}
           </h2>
           <p className="text-xs text-secondary mt-1">
-            Auto-populated from Google ADK agentic pipeline and Neo4j evidence graph.
+            Auto-populated from Google ADK agentic pipeline and Google Cloud Spanner Graph evidence.
           </p>
         </div>
 

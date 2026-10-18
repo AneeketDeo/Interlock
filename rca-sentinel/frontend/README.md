@@ -76,7 +76,7 @@ Follow this scripted walkthrough to present RCA-Sentinel to technical and busine
 | Elapsed Time | Screen / Action | Hotkey / Click | Narrative & Talking Points |
 | :--- | :--- | :--- | :--- |
 | **0:00 - 0:35** | **Command Center** | `G` (Reset to Stage 0) $\rightarrow$ `Space` (Play) | *"We are at Austin Advanced Manufacturing Plant 01. Four production lines are running nominally. Watch Line 03: a 12.2% scrap spike suddenly trips statistical CUSUM alarms on Machine Station-03B. Cost of poor quality surges. Every metric on screen answers 'so what?' for operations."* |
-| **0:35 - 1:25** | **Incident Case Board** | Click banner `Open Case Board` or press `2` | *"The Google ADK multi-agent pipeline immediately kicks off. In under 2 seconds, the DiagnoseAgent traverses our Neo4j knowledge graph across physical machines, ERP batches, and CMMS logs. Look at the Root Cause Reveal: it isolates a compound failure—AlloyTech Lot #40921 had 1.82% silicon (+34% over spec), which combined with a skipped spindle tramming calibration by Maintenance Crew B during a rushed 4-minute shift handover. Notice how alternative hypotheses like tool wear are automatically dimmed and ruled out."* |
+| **0:35 - 1:25** | **Incident Case Board** | Click banner `Open Case Board` or press `2` | *"The Google ADK multi-agent pipeline immediately kicks off. In under 2 seconds, the DiagnoseAgent executes ISO GQL multi-hop traversals over Google Cloud Spanner Graph across physical machines, ERP batches, and CMMS logs. Look at the Root Cause Reveal: it isolates a compound failure—AlloyTech Lot #40921 had 1.82% silicon (+34% over spec), which combined with a skipped spindle tramming calibration by Maintenance Crew B during a rushed 4-minute shift handover. Notice how alternative hypotheses like tool wear are automatically dimmed and ruled out."* |
 | **1:25 - 2:05** | **Blast Radius & Impact** | Press `3` (Blast Radius) | *"What is the business exposure? Our ForecastAgent traces downstream: 420 assemblies are contaminated across 3 batches affecting Tesla Powertrain and Boeing Tier-1 purchase orders. Gross unmitigated risk is $184,800. But if we contain right now, avoided loss is $128,400."* |
 | **2:05 - 2:40** | **Approval Gate (HITL)** | Press `4` (Approvals) | *"AI agents cannot trip physical actuators autonomously. The RemediateAgent drafts 3 gated actions: 1) Emergency PLC interlock on Station-03b, 2) ERP quarantine of Lot #40921 with auto-reroute to verified backup Lot #40889, 3) Dispatch emergency CMMS work order. As Chief Reliability Engineer, I review the before/after and sign approval. Notice the permanent DRY_RUN safety banner."* |
 | **2:40 - 3:00** | **Resolution & Verification** | Press `1` (Return to Command Center) | *"Watch the Plant Floor schematic update live: Station-03B enters physical feed hold, the conveyor visibly diverts to clean Lot #40889, scrap rates collapse back to 0.8%, and $128,400 in plant loss is permanently avoided. A formal 8D report is auto-generated and ready for audit."* |
@@ -101,7 +101,7 @@ Connects to the FastAPI backend (`:8000`) and FastMCP server (`:8001`) via TanSt
 ```bash
 # In .env or shell:
 VITE_DATA_MODE=live
-VITE_API_BASE_URL=http://localhost:8000
+VITE_API_BASE_URL=https://rca-sentinel-864573324943.asia-south1.run.app
 npm run dev
 ```
 

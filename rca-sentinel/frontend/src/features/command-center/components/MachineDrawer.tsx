@@ -11,7 +11,7 @@ interface MachineDrawerProps {
 export function MachineDrawer({ station, onClose, onOpenCase }: MachineDrawerProps) {
   if (!station) return null;
 
-  const isCulprit = station.id === 'st-03b';
+  const isCulprit = station.status === 'critical' || station.id === 'st-03b' || station.id === 'M02';
 
   return (
     <div className="fixed inset-y-0 right-0 w-96 bg-panel border-l border-strong shadow-2xl z-50 flex flex-col justify-between animate-in slide-in-from-right duration-200">
@@ -99,7 +99,7 @@ export function MachineDrawer({ station, onClose, onOpenCase }: MachineDrawerPro
             </div>
             {isCulprit && (
               <div className="p-2 rounded bg-critical-bg text-critical text-[11px] font-mono border border-critical-border">
-                <strong>[OUT-OF-SPECIFICATION]</strong> Silicon measured at 1.82% (Spec: ≤ 1.35%). AlloyTech Global Tier-3 supplier.
+                <strong>[UPPER-EDGE ALLOY ANOMALY]</strong> Lot LOT-409 upper-edge hardness (31.7 HRC / 0.219% C) compounding with unverified thermal spindle offset.
               </div>
             )}
           </div>

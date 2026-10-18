@@ -40,7 +40,7 @@ export function ProvenanceDrawer({ nodeData, onClose }: ProvenanceDrawerProps) {
           <div className="p-3 bg-raised/50 rounded border border-subtle space-y-2">
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Source System:</span>
-              <span className="text-white font-bold">{nodeData.sourceSystem || 'Neo4j Aura KG'}</span>
+              <span className="text-white font-bold">{nodeData.sourceSystem || 'Google Cloud Spanner Graph (FactoryGraph)'}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Record ID:</span>

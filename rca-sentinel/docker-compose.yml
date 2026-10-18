@@ -1,7 +1,90 @@
 services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rca-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=${APP_ENV:-dev}
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-project-a8fa4909-225e-4882-b45}
+      - GCP_LOCATION=${GCP_LOCATION:-us-central1}
+      - SPANNER_INSTANCE_ID=${SPANNER_INSTANCE_ID:-rca}
+      - SPANNER_DATABASE_ID=${SPANNER_DATABASE_ID:-rca-db}
+      - SPANNER_GRAPH_NAME=${SPANNER_GRAPH_NAME:-FactoryGraph}
+      - PUBSUB_TOPIC_ID=${PUBSUB_TOPIC_ID:-telemetry-ingest-topic}
+      - PUBSUB_SUBSCRIPTION_ID=${PUBSUB_SUBSCRIPTION_ID:-telemetry-anomaly-sub}
+      - BIGQUERY_DATASET=${BIGQUERY_DATASET:-rca_historian}
+      - BIGQUERY_TABLE=${BIGQUERY_TABLE:-ObservationWindow}
+      - USE_VERTEX_AI=true
+      - GOOGLE_GENAI_USE_VERTEXAI=true
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  mcp-server:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rca-mcp-server
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    environment:
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-project-a8fa4909-225e-4882-b45}
+      - SPANNER_INSTANCE_ID=${SPANNER_INSTANCE_ID:-rca}
+      - SPANNER_DATABASE_ID=${SPANNER_DATABASE_ID:-rca-db}
+      - SPANNER_GRAPH_NAME=${SPANNER_GRAPH_NAME:-FactoryGraph}
+      - USE_VERTEX_AI=true
+      - GOOGLE_GENAI_USE_VERTEXAI=true
+    volumes:
+      - ./backend:/app
+    command: python -m app.mcp_server.server
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rca-worker
+    env_file:
+      - .env
+    environment:
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-project-a8fa4909-225e-4882-b45}
+      - SPANNER_INSTANCE_ID=${SPANNER_INSTANCE_ID:-rca}
+      - SPANNER_DATABASE_ID=${SPANNER_DATABASE_ID:-rca-db}
+      - SPANNER_GRAPH_NAME=${SPANNER_GRAPH_NAME:-FactoryGraph}
+      - PUBSUB_TOPIC_ID=${PUBSUB_TOPIC_ID:-telemetry-ingest-topic}
+      - PUBSUB_SUBSCRIPTION_ID=${PUBSUB_SUBSCRIPTION_ID:-telemetry-anomaly-sub}
+      - BIGQUERY_DATASET=${BIGQUERY_DATASET:-rca_historian}
+      - BIGQUERY_TABLE=${BIGQUERY_TABLE:-ObservationWindow}
+    volumes:
+      - ./backend:/app
+    command: python -m app.detection.stream_consumer
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: rca-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=https://rca-sentinel-864573324943.asia-south1.run.app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0
+
+  # ── Legacy / Fallback Services (Optional, run with: docker compose --profile legacy up) ──
   timescaledb:
     image: timescale/timescaledb:latest-pg16
     container_name: rca-timescaledb
+    profiles:
+      - legacy
     environment:
       POSTGRES_USER: ${TIMESCALE_USER:-rca}
       POSTGRES_PASSWORD: ${TIMESCALE_PASSWORD:-rca_password}
@@ -19,6 +102,8 @@ services:
   redis:
     image: redis:7-alpine
     container_name: rca-redis
+    profiles:
+      - legacy
     ports:
       - "6379:6379"
     volumes:
@@ -29,79 +114,6 @@ services:
       timeout: 5s
       retries: 5
     command: redis-server --appendonly yes
-
-  api:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: rca-api
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env
-    environment:
-      - TIMESCALE_HOST=timescaledb
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      timescaledb:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - ./backend:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-
-  mcp-server:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: rca-mcp-server
-    ports:
-      - "8001:8001"
-    env_file:
-      - .env
-    environment:
-      - TIMESCALE_HOST=timescaledb
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      timescaledb:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - ./backend:/app
-    command: python -m app.mcp_server.server
-
-  worker:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: rca-worker
-    env_file:
-      - .env
-    environment:
-      - TIMESCALE_HOST=timescaledb
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      timescaledb:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - ./backend:/app
-    command: python -m app.detection.stream_consumer
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: rca-frontend
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    command: npm run dev -- --host 0.0.0.0
 
 volumes:
   timescale_data:

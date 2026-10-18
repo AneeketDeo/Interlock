@@ -2,43 +2,55 @@ import { Bot } from 'lucide-react';
 import { useAppStore } from '../../../state/useAppStore';
 
 export function AgentActivityStream() {
-  const { timelineStage } = useAppStore();
+  const { timelineStage, dataMode } = useAppStore();
+
+  const isLive = dataMode === 'live';
 
   const events = [
     {
       agent: 'DetectAgent',
       stage: 'Stage 1 (D2)',
-      time: '22:01:14',
+      time: '2026-10-15 07:15',
       status: timelineStage >= 2 ? 'done' : 'pending',
-      summary: 'Confirmed CUSUM step-shift on sensor-vib-03b and 12.2% scrap spike on Line 03. Transient noise rejected.',
+      summary: isLive
+        ? 'Confirmed scrap spike (11.8%) on CNC milling centers M02, M03, M06, M09, M11 across Lines L1, L2, L3. Transient noise rejected.'
+        : 'Confirmed CUSUM step-shift on sensor-vib-03b and 12.2% scrap spike on Line 03. Transient noise rejected.',
     },
     {
       agent: 'DiagnoseAgent',
       stage: 'Stage 2 (D4)',
-      time: '22:01:15',
+      time: '2026-10-15 07:16',
       status: timelineStage >= 3 ? 'done' : 'pending',
-      summary: 'Traversed graph across 4 hops. Identified AlloyTech Lot #40921 (1.82% Si) & Crew B uncalibrated spindle runout (0.035mm). Decoys dimmed.',
+      summary: isLive
+        ? 'Traversed Spanner FactoryGraph across 4 hops. Identified Lot LOT-409 (31.7 HRC / 0.219% C) & Crew A skipped thermal calibration (HO-20261014-S). Decoys dimmed.'
+        : 'Traversed graph across 4 hops. Identified AlloyTech Lot #40921 (1.82% Si) & Crew B uncalibrated spindle runout (0.035mm). Decoys dimmed.',
     },
     {
       agent: 'ClassifyAgent',
       stage: 'Stage 3 (PFMEA)',
-      time: '22:01:16',
+      time: '2026-10-15 07:16',
       status: timelineStage >= 4 ? 'done' : 'pending',
-      summary: 'Matched FM-WAF-001 (Thermal Spindle Warp). RPN calculated at 280 (S8 O5 D7). Recurrence risk flagged as high without tramming.',
+      summary: isLive
+        ? 'Matched FM-01 / FM-02 (Upper-Edge Hardness Alloy Chatter & Unverified Thermal Spindle Offset). RPN calculated at 280 (S8 O5 D7).'
+        : 'Matched FM-WAF-001 (Thermal Spindle Warp). RPN calculated at 280 (S8 O5 D7). Recurrence risk flagged as high without tramming.',
     },
     {
       agent: 'ForecastAgent',
       stage: 'Stage 4 (Risk)',
-      time: '22:01:17',
+      time: '2026-10-15 07:17',
       status: timelineStage >= 5 ? 'done' : 'pending',
-      summary: 'Forward blast radius computed: 420 assemblies across 3 active customer delivery batches. Total exposure: $184,800.',
+      summary: isLive
+        ? 'Forward blast radius computed: 8 machines that processed LOT-409 across Lines L1, L2, L3. Unmitigated exposure: $184,800.'
+        : 'Forward blast radius computed: 420 assemblies across 3 active customer delivery batches. Total exposure: $184,800.',
     },
     {
       agent: 'RemediateAgent',
       stage: 'Stage 5 (D3/D5)',
-      time: '22:01:18',
+      time: '2026-10-15 07:18',
       status: timelineStage >= 6 ? 'done' : 'pending',
-      summary: 'Drafted 3 containment proposals: Station-03b interlock, ERP lot quarantine with switch to Lot #40889, priority CMMS recalibration. Awaiting human approval.',
+      summary: isLive
+        ? 'Drafted 3 containment proposals: Feed hold on M02/M03/M06/M09/M11, ERP lot quarantine with switch to LOT-377, priority CMMS recalibration. Awaiting human approval.'
+        : 'Drafted 3 containment proposals: Station-03b interlock, ERP lot quarantine with switch to Lot #40889, priority CMMS recalibration. Awaiting human approval.',
     },
   ];
 

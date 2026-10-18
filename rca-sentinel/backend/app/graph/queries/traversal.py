@@ -50,10 +50,15 @@ class GraphTraversalQueries:
 
     async def _trace_lot_provenance_spanner(self, lot_id: str) -> dict[str, Any]:
         """ISO GQL multi-hop supplier provenance traversal matching exact FactoryGraph ontology."""
+        lot_key = lot_id.strip()
+        # Resolve common demo alias lot-40921 / 40921 -> LOT-409 (planted culprit in Spanner)
+        if lot_key.lower().replace("-", "").replace("#", "") in ("lot40921", "40921"):
+            lot_key = "LOT-409"
+
         query = """
         GRAPH FactoryGraph
         MATCH (target:MaterialLot)
-        WHERE target.lot_id = @lot_id
+        WHERE UPPER(target.lot_id) = UPPER(@lot_id)
         OPTIONAL MATCH (target)-[:SUPPLIED_BY]->(target_sup:Supplier)
         OPTIONAL MATCH (target)-[:HAS_CERT]->(cert:MillCertificate)
         OPTIONAL MATCH (upstream_sup:Supplier)-[:SUPPLIES]->(target_sup)
@@ -76,7 +81,7 @@ class GraphTraversalQueries:
         """
         records = await self.client.execute_gql(
             query,
-            parameters={"lot_id": lot_id},
+            parameters={"lot_id": lot_key},
             param_types_map={"lot_id": param_types.STRING},
         )
         if not records:
@@ -154,10 +159,15 @@ class GraphTraversalQueries:
 
     async def _get_machine_subgraph_spanner(self, machine_id: str) -> dict[str, Any]:
         """ISO GQL machine subgraph query using exact ontology labels from spanner_schema_backup.sql."""
+        machine_key = machine_id.strip()
+        # Resolve demo alias station-03b -> M12
+        if machine_key.lower().replace("-", "").replace("_", "") in ("station03b", "stn03b"):
+            machine_key = "M12"
+
         query = """
         GRAPH FactoryGraph
         MATCH (m:Machine)
-        WHERE m.machine_id = @machine_id
+        WHERE UPPER(m.machine_id) = UPPER(@machine_id)
         OPTIONAL MATCH (m)-[:HAS_SENSOR]->(s:Sensor)
         OPTIONAL MATCH (m)-[:PROCESSED]->(lot:MaterialLot)
         OPTIONAL MATCH (lot)-[:SUPPLIED_BY]->(sup:Supplier)
@@ -179,7 +189,7 @@ class GraphTraversalQueries:
         """
         records = await self.client.execute_gql(
             query,
-            parameters={"machine_id": machine_id},
+            parameters={"machine_id": machine_key},
             param_types_map={"machine_id": param_types.STRING},
         )
         if not records:
@@ -284,11 +294,15 @@ class GraphTraversalQueries:
         self, machine_id: str, limit: int = 10
     ) -> list[dict[str, Any]]:
         """Find recent maintenance events and calibration offsets for a machine."""
+        machine_key = machine_id.strip()
+        if machine_key.lower().replace("-", "").replace("_", "") in ("station03b", "stn03b"):
+            machine_key = "M12"
+
         if isinstance(self.client, SpannerGraphClient):
             query = """
             GRAPH FactoryGraph
             MATCH (cal:Calibration)-[:CALIBRATED]->(m:Machine)
-            WHERE m.machine_id = @machine_id
+            WHERE UPPER(m.machine_id) = UPPER(@machine_id)
             OPTIONAL MATCH (cal)-[:DURING_HANDOVER]->(h:Handover)
             OPTIONAL MATCH (h)-[:HANDOVER_FROM]->(crew:Crew)
             RETURN cal.calibration_id AS id,
@@ -308,7 +322,7 @@ class GraphTraversalQueries:
             """
             return await self.client.execute_gql(
                 query,
-                parameters={"machine_id": machine_id, "limit": limit},
+                parameters={"machine_id": machine_key, "limit": limit},
                 param_types_map={
                     "machine_id": param_types.STRING,
                     "limit": param_types.INT64,

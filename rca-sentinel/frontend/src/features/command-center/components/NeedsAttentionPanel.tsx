@@ -58,10 +58,10 @@ export function NeedsAttentionPanel() {
                 OVERDUE CALIBRATION
               </span>
               <h4 className="font-heading font-bold text-sm text-white mt-0.5">
-                Station-03b Dynamic Runout Tramming
+                Step 6: Thermal Offset Verification (M02, M03, M06, M09, M11)
               </h4>
               <p className="text-secondary text-[11px] mt-0.5">
-                Skipped by Crew B during rushed 4-min shift handover. Current offset: 0.035mm.
+                Skipped by Crew A during rushed 6-min shift handover HO-20261014-S. Uncompensated spindle drift.
               </p>
             </div>
           </div>
@@ -83,10 +83,10 @@ export function NeedsAttentionPanel() {
                 SUPPLIER QUARANTINE HOLD
               </span>
               <h4 className="font-heading font-bold text-sm text-white mt-0.5">
-                AlloyTech Global &bull; Lot #40921 (1,200 kg)
+                Apex Drivetrain / Meridian T3 &bull; Lot LOT-409 (12,000 kg)
               </h4>
               <p className="text-secondary text-[11px] mt-0.5">
-                Defect rate: 1.82% Si. Global quality block recommended across Austin plant.
+                Upper-edge hardness (31.7 HRC) and carbon (0.219%). Quality hold active across Austin lines.
               </p>
             </div>
           </div>

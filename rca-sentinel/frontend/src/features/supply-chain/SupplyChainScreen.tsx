@@ -1,11 +1,18 @@
 import { useState } from 'react';
 import { Package, ShieldCheck } from 'lucide-react';
 import { useAppStore } from '../../state/useAppStore';
-import { SupplierLot } from '../../mock/fixtures';
 
 export function SupplyChainScreen() {
   const { lots } = useAppStore();
-  const [selectedLot, setSelectedLot] = useState<SupplierLot>(lots[0]);
+  const [selectedLotId, setSelectedLotId] = useState<string | null>(null);
+
+  const activeLot = (selectedLotId && lots.find((l) => l.id === selectedLotId)) 
+    || lots.find((l) => l.id === 'LOT-409') 
+    || lots[0];
+
+  const verifiedLot = lots.find((l) => l.id === 'LOT-377' || l.quarantineStatus === 'verified_buffer') 
+    || lots.find((l) => l.id !== 'LOT-409' && l.id !== 'lot-40921') 
+    || lots[0];
 
   return (
     <div className="space-y-6">
@@ -13,7 +20,7 @@ export function SupplyChainScreen() {
       <div className="p-5 bg-panel border border-subtle rounded-md flex flex-wrap items-center justify-between gap-4">
         <div>
           <span className="font-mono text-xs text-dim uppercase tracking-wider block">
-            RAW MATERIAL &amp; SUPPLIER GENEALOGY
+            RAW MATERIAL &amp; SUPPLIER GENEALOGY (CLOUD SPANNER GRAPH)
           </span>
           <h2 className="font-heading font-bold text-2xl text-white mt-1">
             Supplier Lot Traceability &amp; Risk Quarantine
@@ -26,7 +33,7 @@ export function SupplyChainScreen() {
         {/* Quick Buffer Readiness Badge */}
         <div className="p-3 bg-healthy-bg rounded border border-healthy-border font-mono text-xs text-right">
           <span className="text-healthy text-[10px] block font-bold">VERIFIED BACKUP BATCH</span>
-          <span className="text-white font-bold">Lot #40889 (PrecisionAlloy)</span>
+          <span className="text-white font-bold">{verifiedLot ? `${verifiedLot.id} (${verifiedLot.supplierName})` : 'LOT-377 (Helix Powertrain)'}</span>
           <span className="text-healthy text-[11px] block mt-0.5">Staged at Buffer 03 &bull; Ready</span>
         </div>
       </div>
@@ -59,15 +66,15 @@ export function SupplyChainScreen() {
             </thead>
             <tbody className="divide-y divide-subtle/50">
               {lots.map((lot) => {
-                const isCulprit = lot.id === 'lot-40921';
-                const isVerified = lot.id === 'lot-40889';
+                const isCulprit = lot.id === 'lot-40921' || lot.id === 'LOT-409' || lot.siliconContentPct > lot.specCeilingPct;
+                const isVerified = lot.id === 'lot-40889' || lot.quarantineStatus === 'verified_buffer';
 
                 return (
                   <tr
                     key={lot.id}
-                    onClick={() => setSelectedLot(lot)}
+                    onClick={() => setSelectedLotId(lot.id)}
                     className={`hover:bg-raised/60 transition-colors cursor-pointer ${
-                      selectedLot.id === lot.id ? 'bg-raised' : ''
+                      activeLot?.id === lot.id ? 'bg-raised' : ''
                     }`}
                   >
                     <td className="p-3 font-bold text-white flex items-center gap-2">
@@ -105,7 +112,7 @@ export function SupplyChainScreen() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedLot(lot);
+                          setSelectedLotId(lot.id);
                         }}
                         className="text-cobalt font-bold hover:underline"
                       >
@@ -126,28 +133,28 @@ export function SupplyChainScreen() {
           <div className="border-b border-subtle pb-3">
             <span className="font-mono text-[10px] text-dim uppercase">METALLURGY CERTIFICATE</span>
             <h4 className="font-heading font-bold text-lg text-white mt-0.5">
-              Spectrometry Certificate: {selectedLot.id}
+              Spectrometry Certificate: {activeLot.id}
             </h4>
           </div>
 
           <div className="space-y-2 text-xs font-mono">
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Vendor Code:</span>
-              <span className="text-white font-bold">{selectedLot.vendorCode}</span>
+              <span className="text-white font-bold">{activeLot.vendorCode}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Material Specification:</span>
-              <span className="text-white">{selectedLot.materialType}</span>
+              <span className="text-white">{activeLot.materialType}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Measured Silicon Content:</span>
-              <span className={`font-bold ${selectedLot.siliconContentPct > selectedLot.specCeilingPct ? 'text-critical' : 'text-healthy'}`}>
-                {selectedLot.siliconContentPct}% ({selectedLot.siliconContentPct > selectedLot.specCeilingPct ? '+34.8% OVER CEILING' : 'WITHIN CEILING'})
+              <span className={`font-bold ${activeLot.siliconContentPct > activeLot.specCeilingPct ? 'text-critical' : 'text-healthy'}`}>
+                {activeLot.siliconContentPct}% ({activeLot.siliconContentPct > activeLot.specCeilingPct ? '+34.8% OVER CEILING' : 'WITHIN CEILING'})
               </span>
             </div>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Historical Risk Score:</span>
-              <span className="font-bold text-white">{selectedLot.riskScore} / 100</span>
+              <span className="font-bold text-white">{activeLot.riskScore} / 100</span>
             </div>
           </div>
         </div>
@@ -160,10 +167,10 @@ export function SupplyChainScreen() {
               <span>VERIFIED CLEAN BUFFER ALTERNATIVE</span>
             </div>
             <h4 className="font-heading font-bold text-lg text-white">
-              PrecisionAlloy Lot #40889 (Staged at Buffer 03)
+              {verifiedLot ? `${verifiedLot.supplierName} Lot ${verifiedLot.id} (Staged at Buffer)` : 'Helix Powertrain Lot LOT-377 (Staged at Buffer)'}
             </h4>
             <p className="text-xs text-secondary mt-1 font-sans leading-relaxed">
-              Fully certified Tier-1 supplier batch with 1.12% silicon (nominal tolerance). Ready for pneumatic hopper transfer to Line 03 within 8 minutes of engineering approval.
+              Fully certified Tier-1 supplier batch with nominal chemical composition (29.6 HRC, 0.201% C). Ready for pneumatic hopper transfer across machining lines within 8 minutes of engineering approval.
             </p>
           </div>
 

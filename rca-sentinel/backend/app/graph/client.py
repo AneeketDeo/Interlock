@@ -347,7 +347,8 @@ def get_spanner_graph_client() -> SpannerGraphClient:
 async def init_spanner_graph_client(settings: Settings | None = None) -> SpannerGraphClient:
     """Initialize and connect the Cloud Spanner Graph client singleton."""
     global _spanner_graph_client
-    _spanner_graph_client = SpannerGraphClient(settings)
+    #_spanner_graph_client = SpannerGraphClient(settings)
+    _spanner_graph_client = SpannerGraphClient(settings=settings)
     await _spanner_graph_client.connect()
     return _spanner_graph_client
 

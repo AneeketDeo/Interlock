@@ -140,10 +140,10 @@ export function PlantFloorMimic({ onSelectStation }: PlantFloorMimicProps) {
 
         {/* Production Lines */}
         <div className="space-y-6 relative z-10">
-          {lines.map((line, lineIdx) => {
-            const isLine3 = line.id === 'line-03';
-            const isCriticalSpike = isLine3 && timelineStage >= 1 && timelineStage < 7;
-            const isHalted = isLine3 && timelineStage >= 7;
+          {lines.map((line) => {
+            const isCriticalSpike = line.status === 'degraded' || (line.id === 'line-03' && timelineStage >= 1 && timelineStage < 7);
+            const isHalted = line.status === 'halted' || (line.id === 'line-03' && timelineStage >= 7);
+            const gridCols = line.stations.length <= 4 ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-2 md:grid-cols-5';
 
             return (
               <div
@@ -169,7 +169,7 @@ export function PlantFloorMimic({ onSelectStation }: PlantFloorMimicProps) {
                           : 'bg-healthy/20 text-healthy'
                       }`}
                     >
-                      {isCriticalSpike ? 'CRITICAL SCRAP (12.2%)' : isHalted ? 'LINE HALTED (INTERLOCKED)' : 'NOMINAL'}
+                      {isCriticalSpike ? `SCRAP ELEVATED (${line.scrapRate.toFixed(1)}%)` : isHalted ? 'LINE HALTED (INTERLOCKED)' : 'NOMINAL'}
                     </span>
                   </div>
 
@@ -193,14 +193,14 @@ export function PlantFloorMimic({ onSelectStation }: PlantFloorMimicProps) {
                 </div>
 
                 {/* Stations Row */}
-                <div className="grid grid-cols-5 gap-3 items-center">
+                <div className={`grid ${gridCols} gap-3 items-center`}>
                   {line.stations.map((stationId, stIdx) => {
                     const station = stations.find((s) => s.id === stationId);
                     if (!station) return null;
 
-                    const isFocalStation = station.id === 'st-03b';
-                    const isFocalSpike = isFocalStation && timelineStage >= 1 && timelineStage < 7;
-                    const isFocalInterlocked = isFocalStation && timelineStage >= 7;
+                    const isFocalStation = station.status === 'critical' || station.id === 'st-03b' || station.id === 'M02';
+                    const isFocalSpike = (isFocalStation || station.status === 'critical') && timelineStage >= 1 && timelineStage < 7;
+                    const isFocalInterlocked = station.status === 'interlocked' || (isFocalStation && timelineStage >= 7);
 
                     return (
                       <div key={station.id} className="relative group/station">
@@ -220,7 +220,7 @@ export function PlantFloorMimic({ onSelectStation }: PlantFloorMimicProps) {
                         >
                           {/* Station Label & Icon */}
                           <div className="flex items-center justify-between mb-1.5">
-                            <span className="font-mono text-[10px] text-dim uppercase">ST 0{lineIdx + 1}{String.fromCharCode(65 + stIdx)}</span>
+                            <span className="font-mono text-[10px] text-dim uppercase">{station.id}</span>
                             {isFocalSpike ? (
                               <AlertCircle className="h-4 w-4 text-critical animate-bounce" />
                             ) : isFocalInterlocked ? (
@@ -296,13 +296,13 @@ export function PlantFloorMimic({ onSelectStation }: PlantFloorMimicProps) {
                   })}
                 </div>
 
-                {/* If Line 03 is in spike or containment, show actionable path banner */}
+                {/* If line is in spike or containment, show actionable path banner */}
                 {isCriticalSpike && (
                   <div className="mt-3 p-2 bg-critical-bg border border-critical-border rounded flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-critical">[INCIDENT #INC-8921]</span>
+                      <span className="font-mono font-bold text-critical">[INCIDENT ACTIVE]</span>
                       <span className="text-primary">
-                        Root cause identified as <strong>Lot #40921 (1.82% Si)</strong> + <strong>Crew B Skipped Calibration</strong>.
+                        Root cause identified as <strong>Lot LOT-409 (Upper-Edge Hardness Alloy)</strong> + <strong>Crew A Skipped Calibration (Step 6 Thermal Offset)</strong>.
                       </span>
                     </div>
                     <button
@@ -319,7 +319,7 @@ export function PlantFloorMimic({ onSelectStation }: PlantFloorMimicProps) {
                     <div className="flex items-center gap-2">
                       <CornerDownRight className="h-4 w-4 shrink-0 text-cobalt" />
                       <span>
-                        FEEDER REROUTED: Active lot switched to <strong>Verified Lot #40889 (PrecisionAlloy Corp, 1.12% Si)</strong>. Line 03 restart pending recalibration.
+                        FEEDER REROUTED: Active lot switched to <strong>Verified Buffer Lot LOT-377 (Helix Powertrain)</strong>. Machining restart pending recalibration.
                       </span>
                     </div>
                     <span className="font-bold text-healthy">$128,400 LOSS AVOIDED</span>

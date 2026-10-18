@@ -46,33 +46,39 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         env=settings.app_env,
     )
 
-    # Initialize clients
+    # Initialize Cloud Spanner Graph client
     try:
-        await init_neo4j_client(settings)
-    except GraphConnectionError:
-        logger.error("neo4j_connection_failed_at_startup")
-        # Allow startup to continue for local dev without Aura
+        from app.graph.client import close_spanner_graph_client, init_spanner_graph_client
+
+        await init_spanner_graph_client(settings)
+        logger.info(
+            "spanner_graph_initialized",
+            instance=settings.spanner_instance_id,
+            database=settings.spanner_database_id,
+            graph=settings.spanner_graph_name,
+        )
+    except Exception as exc:
+        logger.warning("spanner_graph_init_deferred", error=str(exc))
         if settings.app_env == "prod":
             raise
 
-    try:
-        await init_redis_client(settings)
-    except Exception:
-        logger.error("redis_connection_failed_at_startup")
-        if settings.app_env == "prod":
-            raise
-
-    try:
-        await init_timescale_client(settings)
-    except Exception:
-        logger.error("timescaledb_connection_failed_at_startup")
-        if settings.app_env == "prod":
-            raise
+    # Optional legacy fallback clients
+    if getattr(settings, "neo4j_password", None) and settings.neo4j_password:
+        try:
+            await init_neo4j_client(settings)
+        except Exception:
+            logger.warning("neo4j_init_skipped")
 
     logger.info("app_started")
     yield
 
     # Shutdown
+    try:
+        from app.graph.client import close_spanner_graph_client
+
+        await close_spanner_graph_client()
+    except Exception:
+        pass
     await close_neo4j_client()
     await close_redis_client()
     await close_timescale_client()
@@ -85,7 +91,7 @@ def create_app() -> FastAPI:
 
     app = FastAPI(
         title="RCA-Sentinel API",
-        description="Agentic knowledge-graph-driven Root Cause Analysis platform",
+        description="Agentic knowledge-graph-driven Root Cause Analysis platform (Google Cloud Spanner Graph + Vertex AI)",
         version=settings.app_version,
         lifespan=lifespan,
         docs_url="/docs",
@@ -105,11 +111,13 @@ def create_app() -> FastAPI:
     _register_exception_handlers(app)
 
     # Mount routers
+    from app.api.graph import router as graph_router
     from app.api.health import router as health_router
     from app.api.ingestion import router as ingestion_router
 
     app.include_router(health_router, tags=["Health"])
     app.include_router(ingestion_router, prefix="/api/v1")
+    app.include_router(graph_router, prefix="/api/v1")
 
     return app
 

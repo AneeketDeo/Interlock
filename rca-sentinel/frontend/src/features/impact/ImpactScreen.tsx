@@ -10,8 +10,9 @@ import { formatCurrency } from '../../lib/formatters';
 
 export function ImpactScreen() {
   const navigate = useNavigate();
-  const { activeCase } = useAppStore();
+  const { activeCase, dataMode } = useAppStore();
 
+  const isLive = dataMode === 'live';
   const unmitigated = activeCase.grossFinancialExposure; // $184,800
   const avoided = activeCase.avoidedLoss; // $128,400
 
@@ -20,21 +21,31 @@ export function ImpactScreen() {
     {
       title: '1. SOURCE CONTAMINANT',
       items: [
-        { id: 'lot', name: 'Lot #40921 (AlloyTech)', detail: '1,200kg (1.82% Si)', color: '#FF5A3C' },
+        {
+          id: 'lot',
+          name: isLive ? 'Lot LOT-409 (Apex / Meridian T3)' : 'Lot #40921 (AlloyTech)',
+          detail: isLive ? '12,000kg (31.7 HRC / 0.219% C)' : '1,200kg (1.82% Si)',
+          color: '#FF5A3C',
+        },
       ],
     },
     {
-      title: '2. MACHINING STATION',
+      title: '2. MACHINING WORK CENTERS',
       items: [
-        { id: 'st03b', name: 'Station-03b Spindle', detail: '4.82 mm/s vibration', color: '#FF5A3C' },
+        {
+          id: 'st03b',
+          name: isLive ? 'CNC Milling Centers (M02, M03, M06, M09, M11)' : 'Station-03b Spindle',
+          detail: isLive ? '11.8% scrap • Skipped Step 6' : '4.82 mm/s vibration',
+          color: '#FF5A3C',
+        },
       ],
     },
     {
       title: '3. AFFECTED WIP BATCHES',
       items: [
-        { id: 'b1', name: 'Batch #40921-A', detail: '140 units (Scrap)', color: '#FF5A3C' },
-        { id: 'b2', name: 'Batch #40921-B', detail: '160 units (Scrap)', color: '#FF5A3C' },
-        { id: 'b3', name: 'Batch #40921-C', detail: '120 units (Quarantined)', color: '#FFB000' },
+        { id: 'b1', name: isLive ? 'Batch #409-A (Line L1)' : 'Batch #40921-A', detail: '140 units (Scrap)', color: '#FF5A3C' },
+        { id: 'b2', name: isLive ? 'Batch #409-B (Line L2)' : 'Batch #40921-B', detail: '160 units (Scrap)', color: '#FF5A3C' },
+        { id: 'b3', name: isLive ? 'Batch #409-C (Line L3)' : 'Batch #40921-C', detail: '120 units (Quarantined)', color: '#FFB000' },
       ],
     },
     {

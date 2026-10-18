@@ -72,6 +72,48 @@ class TestGraphTraversal:
         assert len(result["sensors"]) == 1
         assert len(result["maintenance_events"]) == 1
 
+    def test_format_subgraph_empty(self) -> None:
+        from app.api.graph import _format_subgraph
+
+        res = _format_subgraph("M12", {})
+        assert res["machine_id"] == "M12"
+        assert res["nodes"] == []
+        assert res["edges"] == []
+        assert res["node_count"] == 0
+        assert res["edge_count"] == 0
+
+    def test_format_subgraph_with_neighborhood(self) -> None:
+        from app.api.graph import _format_subgraph
+
+        neighborhood = {
+            "machine": {"id": "M12", "name": "Gear grinder 12", "line_id": "L3"},
+            "line": {"id": "L3", "name": "Assembly Line 03"},
+            "sensors": [{"id": "SN-M12-PRES", "sensor_type": "PRES", "unit": "bar"}],
+            "maintenance_events": [{"id": "CAL-0010", "recorded_result": "PASS"}],
+            "operator_logs": [{"id": "CREW-A", "crew_name": "Crew A"}],
+            "processed_lots": [
+                {
+                    "id": "LOT-377",
+                    "material_id": "MAT-20MNCR5",
+                    "supplier": {"id": "SUP-T1-02", "name": "Helix Powertrain"},
+                }
+            ],
+        }
+        res = _format_subgraph("M12", neighborhood)
+        assert res["machine_id"] == "M12"
+        assert res["node_count"] == 7
+        assert res["edge_count"] == 6
+        node_labels = {n["label"] for n in res["nodes"]}
+        assert node_labels == {
+            "Machine",
+            "ProductionLine",
+            "Sensor",
+            "MaintenanceEvent",
+            "OperatorLog",
+            "MaterialLot",
+            "Supplier",
+        }
+
 
 # ── Backward & Forward Analysis Tests ───────────────────────────────
 

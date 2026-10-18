@@ -31,6 +31,9 @@ export function Shell() {
     toggleTheme,
     role,
     setRole,
+    dataMode,
+    toggleDataMode,
+    isSpannerConnected,
     timelineStage,
     isPlaying,
     playbackSpeed,
@@ -168,7 +171,7 @@ export function Shell() {
             <span className="opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Shortcuts (?)</span>
           </button>
           <div className="px-3 py-1 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono text-dim">
-            v0.1.0 • Neo4j Aura Ready
+            v0.1.0 • GCP Spanner Graph Ready
           </div>
         </div>
       </aside>
@@ -194,6 +197,20 @@ export function Shell() {
                 <Lock className="h-3 w-3" /> DRY_RUN ACTIVE
               </span>
             )}
+
+            {/* Live Spanner vs Mock Mode indicator/toggle */}
+            <button
+              onClick={toggleDataMode}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-mono font-semibold border transition-colors ${
+                dataMode === 'live'
+                  ? 'bg-healthy-bg text-healthy border-healthy-border'
+                  : 'bg-raised text-secondary border-subtle'
+              }`}
+              title="Click to toggle between Live Spanner and Mock Data"
+            >
+              <Database className="h-3 w-3" />
+              <span>{dataMode === 'live' ? (isSpannerConnected ? 'LIVE SPANNER GRAPH' : 'SPANNER (SYNCING)') : 'MOCK MODE'}</span>
+            </button>
           </div>
 
           {/* Center: Scenario Playback / Stepper Controller */}
