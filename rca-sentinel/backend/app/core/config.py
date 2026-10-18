@@ -35,7 +35,15 @@ class Settings(BaseSettings):
     app_name: str = "rca-sentinel"
     app_version: str = "0.1.0"
     log_level: str = "INFO"
-    cors_origins: list[str] | str = Field(default_factory=lambda: ["http://localhost:5173"])
+    cors_origins: list[str] | str = Field(
+        default_factory=lambda: [
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://localhost:3000",
+            "https://project-a8fa4909-225e-4882-b45.web.app",
+            "https://project-a8fa4909-225e-4882-b45.firebaseapp.com",
+        ]
+    )
     secret_key: str = "change-me-to-a-random-secret-key"
 
     # ── Google Cloud Platform ───────────────────────────────────────
@@ -106,7 +114,9 @@ class Settings(BaseSettings):
     @classmethod
     def parse_cors_origins(cls, v: str | list[str]) -> list[str]:
         if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",") if origin.strip()]
+            return [origin.strip().rstrip("/") for origin in v.split(",") if origin.strip()]
+        if isinstance(v, list):
+            return [origin.strip().rstrip("/") for origin in v if origin.strip()]
         return v
 
     @property

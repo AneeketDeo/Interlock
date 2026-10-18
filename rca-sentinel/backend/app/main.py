@@ -101,7 +101,8 @@ def create_app() -> FastAPI:
     # CORS
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.cors_origins,
+        allow_origins=settings.cors_origins if isinstance(settings.cors_origins, list) else [settings.cors_origins],
+        allow_origin_regex=r"https://.*\.web\.app|https://.*\.firebaseapp\.com|https://.*\.run\.app|http://localhost:\d+",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
