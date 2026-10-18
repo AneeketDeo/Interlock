@@ -6,14 +6,21 @@ import {
   User,
   ShieldCheck,
   ChevronRight,
+  FileText,
 } from 'lucide-react';
 import { Node, Edge, MarkerType } from '@xyflow/react';
 import { useAppStore } from '../../state/useAppStore';
 import { EvidenceGraph, GraphNodeData } from './components/EvidenceGraph';
 import { ProvenanceDrawer } from './components/ProvenanceDrawer';
+import { RemediationProcessFlow } from './components/RemediationProcessFlow';
 import { fetchMachineSubgraph } from '../../lib/api';
 
-export function IncidentCaseBoard() {
+interface IncidentCaseBoardProps {
+  onBack?: () => void;
+  onOpenReport?: () => void;
+}
+
+export function IncidentCaseBoard({ onBack, onOpenReport }: IncidentCaseBoardProps = {}) {
   const navigate = useNavigate();
   const { activeCase, timelineStage, proposals, dataMode } = useAppStore();
   const [selectedNode, setSelectedNode] = useState<GraphNodeData | null>(null);
@@ -214,6 +221,15 @@ export function IncidentCaseBoard() {
       <div className="p-5 bg-panel border border-subtle rounded-md">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-subtle pb-3">
           <div className="flex items-center gap-3">
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="px-2.5 py-1 rounded bg-raised border border-subtle text-primary font-mono text-xs hover:border-strong transition-colors flex items-center gap-1 mr-1"
+                title="Return to Incident Dashboard"
+              >
+                <span>&larr; Incidents Fleet</span>
+              </button>
+            )}
             <span className="px-2.5 py-0.5 rounded text-xs font-mono font-bold uppercase bg-critical text-white flex items-center gap-1.5">
               <AlertTriangle className="h-3.5 w-3.5" />
               CRITICAL • SEVERITY 8
@@ -243,12 +259,21 @@ export function IncidentCaseBoard() {
             >
               {isContained ? 'CONTAINMENT ACTIVE' : 'OPEN ANOMALY'}
             </span>
+
+            <button
+              onClick={() => (onOpenReport ? onOpenReport() : navigate('/report'))}
+              className="px-2.5 py-1 rounded bg-raised border border-subtle text-primary font-mono text-[11px] hover:border-strong transition-colors flex items-center gap-1.5"
+              title="View and print the 8D Corrective Action Report"
+            >
+              <FileText className="h-3.5 w-3.5 text-cobalt" />
+              <span>8D Report (Print/PDF)</span>
+            </button>
           </div>
         </div>
 
         {/* Auto-Written Problem Statement */}
         <div className="mt-3">
-          <h2 className="font-heading font-bold text-xl text-white">
+          <h2 className="font-heading font-bold text-xl text-primary">
             {activeCase.title}
           </h2>
           <p className="text-xs text-secondary mt-1 leading-relaxed max-w-4xl font-sans">
@@ -288,7 +313,7 @@ export function IncidentCaseBoard() {
                     {st.status}
                   </span>
                 </div>
-                <div className="font-heading font-bold text-xs text-white truncate">
+                <div className="font-heading font-bold text-xs text-primary truncate">
                   {st.label}
                 </div>
                 <div className="text-[11px] font-mono text-secondary mt-0.5">
@@ -320,7 +345,7 @@ export function IncidentCaseBoard() {
       <div className="space-y-2">
         <div className="flex items-center justify-between px-1">
           <div>
-            <h3 className="font-heading font-bold text-base text-white tracking-wide flex items-center gap-2">
+            <h3 className="font-heading font-bold text-base text-primary tracking-wide flex items-center gap-2">
               <span>ROOT CAUSE REVEAL: MULTI-HOP EVIDENCE GRAPH</span>
               {isLive && (
                 <span className="px-2 py-0.5 rounded bg-cobalt/20 text-cobalt font-mono text-[10px] font-bold">
@@ -357,7 +382,7 @@ export function IncidentCaseBoard() {
         <div className="bg-panel border border-subtle rounded-md p-5 flex flex-col justify-between">
           <div className="border-b border-subtle pb-3 flex items-center justify-between">
             <div>
-              <h4 className="font-heading font-bold text-sm text-white">
+              <h4 className="font-heading font-bold text-sm text-primary">
                 HYPOTHESES LEADERBOARD (RANKED BY LIFT &amp; CONFIDENCE)
               </h4>
               <p className="text-xs text-secondary mt-0.5">
@@ -420,7 +445,7 @@ export function IncidentCaseBoard() {
         <div className="bg-panel border border-subtle rounded-md p-5 flex flex-col justify-between">
           <div className="border-b border-subtle pb-3 flex items-center justify-between">
             <div>
-              <h4 className="font-heading font-bold text-sm text-white">
+              <h4 className="font-heading font-bold text-sm text-primary">
                 FAILURE CLASSIFICATION &amp; PFMEA TAXONOMY
               </h4>
               <p className="text-xs text-secondary mt-0.5">
@@ -435,7 +460,7 @@ export function IncidentCaseBoard() {
           <div className="my-3 space-y-2 text-xs font-mono">
             <div className="flex justify-between py-1.5 border-b border-subtle/40">
               <span className="text-secondary">Failure Mode Code:</span>
-              <span className="text-white font-bold">{isLive ? 'FM-01 / FM-02 (Material & Method Interaction)' : 'FM-WAF-001 (Thermal Spindle Dynamic Warp)'}</span>
+              <span className="text-primary font-bold">{isLive ? 'FM-01 / FM-02 (Material & Method Interaction)' : 'FM-WAF-001 (Thermal Spindle Dynamic Warp)'}</span>
             </div>
             <div className="flex justify-between py-1.5 border-b border-subtle/40">
               <span className="text-secondary">Severity (S):</span>
@@ -447,7 +472,7 @@ export function IncidentCaseBoard() {
             </div>
             <div className="flex justify-between py-1.5 border-b border-subtle/40">
               <span className="text-secondary">Detection (D):</span>
-              <span className="text-white font-bold">7 / 10 (Detected at CMM Gate before shipping)</span>
+              <span className="text-primary font-bold">7 / 10 (Detected at CMM Gate before shipping)</span>
             </div>
             <div className="flex justify-between py-1.5 border-b border-subtle/40">
               <span className="text-secondary">Recurrence Risk:</span>
@@ -457,7 +482,7 @@ export function IncidentCaseBoard() {
 
           <div className="pt-2 border-t border-subtle flex justify-end">
             <button
-              onClick={() => navigate('/report')}
+              onClick={() => (onOpenReport ? onOpenReport() : navigate('/report'))}
               className="text-xs text-cobalt font-mono font-bold hover:underline flex items-center gap-1"
             >
               <span>View Full 8D Root Cause Report</span>
@@ -466,6 +491,9 @@ export function IncidentCaseBoard() {
           </div>
         </div>
       </div>
+
+      {/* ── Three-Fold Remediation Process Flow ─────────────────────────────── */}
+      <RemediationProcessFlow onOpenApprovalGate={() => navigate('/approvals')} />
 
       {/* Slide-over Provenance Drawer */}
       <ProvenanceDrawer nodeData={selectedNode} onClose={() => setSelectedNode(null)} />

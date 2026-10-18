@@ -1,4 +1,4 @@
-# RCA-Sentinel
+# ThreadTrace
 
 > **Autonomous, Knowledge-Graph-Driven Root Cause Analysis (RCA) & Remediation Platform for High-Precision Manufacturing**
 
@@ -16,7 +16,7 @@
 
 ## 1. Overview
 
-**RCA-Sentinel** is an enterprise manufacturing diagnostic platform that detects production line anomalies, traverses an ontology-backed knowledge graph to isolate compound root causes across physical equipment, material supply chains, and maintenance logs, forecasts downstream financial blast radius, and drafts gated containment and corrective actions.
+**ThreadTrace** is an enterprise manufacturing diagnostic platform that detects production line anomalies, traverses an ontology-backed knowledge graph to isolate compound root causes across physical equipment, material supply chains, and maintenance logs, forecasts downstream financial blast radius, and drafts gated containment and corrective actions.
 
 ### Core Capabilities
 - **Native Google Cloud Architecture**: High-frequency PLC sensor telemetry historian in **Google BigQuery**; full plant topology, material traceability, PFMEA taxonomies, and maintenance history in **Google Cloud Spanner Graph** (ISO GQL).

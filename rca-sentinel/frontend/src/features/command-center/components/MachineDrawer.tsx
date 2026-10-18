@@ -33,11 +33,11 @@ export function MachineDrawer({ station, onClose, onOpenCase }: MachineDrawerPro
                 {station.status}
               </span>
             </div>
-            <h3 className="font-heading font-bold text-lg text-white mt-1">{station.name}</h3>
+            <h3 className="font-heading font-bold text-lg text-primary mt-1">{station.name}</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-secondary hover:text-white hover:bg-raised transition-colors"
+            className="p-1 rounded text-secondary hover:text-primary hover:bg-raised transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -49,14 +49,14 @@ export function MachineDrawer({ station, onClose, onOpenCase }: MachineDrawerPro
           <div className="grid grid-cols-2 gap-2">
             <div className="p-3 bg-raised rounded border border-subtle">
               <span className="text-secondary block font-mono text-[10px]">VIBRATION</span>
-              <span className={`font-heading font-bold text-xl tabular-nums ${isCulprit ? 'text-critical' : 'text-white'}`}>
+              <span className={`font-heading font-bold text-xl tabular-nums ${isCulprit ? 'text-critical' : 'text-primary'}`}>
                 {station.vibrationMmS.toFixed(2)} <span className="text-xs font-normal text-secondary">mm/s</span>
               </span>
               <span className="text-[10px] text-dim block mt-0.5">Ceiling: 2.2 mm/s</span>
             </div>
             <div className="p-3 bg-raised rounded border border-subtle">
               <span className="text-secondary block font-mono text-[10px]">SPINDLE TEMP</span>
-              <span className={`font-heading font-bold text-xl tabular-nums ${isCulprit ? 'text-critical' : 'text-white'}`}>
+              <span className={`font-heading font-bold text-xl tabular-nums ${isCulprit ? 'text-critical' : 'text-primary'}`}>
                 {station.temperatureC.toFixed(1)} <span className="text-xs font-normal text-secondary">°C</span>
               </span>
               <span className="text-[10px] text-dim block mt-0.5">Threshold: 55.0°C</span>
@@ -65,16 +65,16 @@ export function MachineDrawer({ station, onClose, onOpenCase }: MachineDrawerPro
 
           {/* Operational Metrics */}
           <div className="p-3 bg-raised/50 rounded border border-subtle space-y-2">
-            <h4 className="font-heading font-bold text-xs uppercase text-white flex items-center gap-1.5">
+            <h4 className="font-heading font-bold text-xs uppercase text-primary flex items-center gap-1.5">
               <Activity className="h-3.5 w-3.5 text-cobalt" /> Operational Health
             </h4>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">OEE (Overall Efficiency):</span>
-              <span className="font-mono text-white font-bold">{formatPercent(station.oee)}</span>
+              <span className="font-mono text-primary font-bold">{formatPercent(station.oee)}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Station Scrap Rate:</span>
-              <span className={`font-mono font-bold ${isCulprit ? 'text-critical' : 'text-white'}`}>
+              <span className={`font-mono font-bold ${isCulprit ? 'text-critical' : 'text-primary'}`}>
                 {formatPercent(station.scrapRate)}
               </span>
             </div>
@@ -90,12 +90,12 @@ export function MachineDrawer({ station, onClose, onOpenCase }: MachineDrawerPro
 
           {/* Material Lineage */}
           <div className="p-3 bg-raised/50 rounded border border-subtle space-y-2">
-            <h4 className="font-heading font-bold text-xs uppercase text-white flex items-center gap-1.5">
+            <h4 className="font-heading font-bold text-xs uppercase text-primary flex items-center gap-1.5">
               <Package className="h-3.5 w-3.5 text-healthy" /> In-Feed Material Lot
             </h4>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Current Lot ID:</span>
-              <span className="font-mono text-white font-semibold">{station.currentLotId}</span>
+              <span className="font-mono text-primary font-semibold">{station.currentLotId}</span>
             </div>
             {isCulprit && (
               <div className="p-2 rounded bg-critical-bg text-critical text-[11px] font-mono border border-critical-border">
@@ -106,16 +106,16 @@ export function MachineDrawer({ station, onClose, onOpenCase }: MachineDrawerPro
 
           {/* Maintenance & Calibration */}
           <div className="p-3 bg-raised/50 rounded border border-subtle space-y-2">
-            <h4 className="font-heading font-bold text-xs uppercase text-white flex items-center gap-1.5">
+            <h4 className="font-heading font-bold text-xs uppercase text-primary flex items-center gap-1.5">
               <Wrench className="h-3.5 w-3.5 text-caution" /> Calibration Status
             </h4>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Last Calibrated:</span>
-              <span className="font-mono text-white">{station.lastCalibrationDate}</span>
+              <span className="font-mono text-primary">{station.lastCalibrationDate}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Assigned Crew:</span>
-              <span className="font-mono text-white">{station.lastCalibratedBy}</span>
+              <span className="font-mono text-primary">{station.lastCalibratedBy}</span>
             </div>
             {isCulprit && (
               <div className="p-2 rounded bg-caution-bg text-caution text-[11px] font-mono border border-caution-border">
@@ -139,7 +139,7 @@ export function MachineDrawer({ station, onClose, onOpenCase }: MachineDrawerPro
         )}
         <button
           onClick={onClose}
-          className="w-full py-2 rounded bg-raised border border-subtle text-secondary hover:text-white text-xs font-mono transition-colors"
+          className="w-full py-2 rounded bg-raised border border-subtle text-secondary hover:text-primary text-xs font-mono transition-colors"
         >
           Close Drawer
         </button>

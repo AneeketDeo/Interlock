@@ -65,7 +65,7 @@ export function MaintenanceScreen() {
           <span className="font-mono text-xs text-dim uppercase tracking-wider block">
             MAINTENANCE &amp; SHIFT HANDOVER INTELLIGENCE {dataMode === 'live' ? '• CLOUD SPANNER GRAPH' : ''}
           </span>
-          <h2 className="font-heading font-bold text-2xl text-white mt-1">
+          <h2 className="font-heading font-bold text-2xl text-primary mt-1">
             Calibration Compliance &amp; Handover Correlation
           </h2>
           <p className="text-xs text-secondary mt-1 max-w-2xl font-sans">
@@ -75,7 +75,7 @@ export function MaintenanceScreen() {
 
         <div className="p-3 bg-critical-bg rounded border border-critical-border font-mono text-xs text-right">
           <span className="text-critical text-[10px] block font-bold">CRITICAL PM VIOLATION</span>
-          <span className="text-white font-bold">Step 6: Thermal Offset Verification</span>
+          <span className="text-primary font-bold">Step 6: Thermal Offset Verification</span>
           <span className="text-critical text-[11px] block mt-0.5">
             Skipped across 7 machines &bull; Handover HO-20261014-S (6.0m Rushed)
           </span>
@@ -86,7 +86,7 @@ export function MaintenanceScreen() {
       <div className="bg-panel border border-subtle rounded-md p-5 space-y-4">
         <div className="border-b border-subtle pb-3 flex items-center justify-between">
           <div>
-            <h3 className="font-heading font-bold text-base text-white tracking-wide flex items-center gap-2">
+            <h3 className="font-heading font-bold text-base text-primary tracking-wide flex items-center gap-2">
               <Wrench className="h-4 w-4 text-caution" />
               CALIBRATION COMPLIANCE MATRIX (MACHINES M01–M12 VS. INSPECTION CYCLES)
             </h3>
@@ -127,7 +127,7 @@ export function MaintenanceScreen() {
                       isAffectedScrap ? 'bg-critical-bg/15 font-semibold' : ''
                     }`}
                   >
-                    <td className="p-3 text-white flex items-center gap-2">
+                    <td className="p-3 text-primary flex items-center gap-2">
                       <span className="font-bold">{row.name}</span>
                       {isAffectedScrap && (
                         <span className="px-1.5 py-0.2 rounded bg-critical text-white text-[9px] uppercase font-bold animate-pulse">
@@ -198,7 +198,7 @@ export function MaintenanceScreen() {
                 <div className="flex items-center justify-between border-b border-subtle pb-3">
                   <div>
                     <span className="font-mono text-[10px] text-dim uppercase">SHIFT {crew.shift}</span>
-                    <h4 className="font-heading font-bold text-base text-white mt-0.5">{crew.name}</h4>
+                    <h4 className="font-heading font-bold text-base text-primary mt-0.5">{crew.name}</h4>
                   </div>
                   <span
                     className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
@@ -216,7 +216,7 @@ export function MaintenanceScreen() {
                 <div className="my-4 space-y-2 text-xs font-mono">
                   <div className="flex justify-between py-1 border-b border-subtle/40">
                     <span className="text-secondary">Lead Technician:</span>
-                    <span className="text-white font-bold">{crew.leadTechnician}</span>
+                    <span className="text-primary font-bold">{crew.leadTechnician}</span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-subtle/40">
                     <span className="text-secondary">PM Compliance Rate:</span>
@@ -226,13 +226,13 @@ export function MaintenanceScreen() {
                   </div>
                   <div className="flex justify-between py-1 border-b border-subtle/40">
                     <span className="text-secondary">Avg Handover Duration:</span>
-                    <span className={`font-bold ${crew.avgHandoverMinutes < 10 ? 'text-critical' : 'text-white'}`}>
+                    <span className={`font-bold ${crew.avgHandoverMinutes < 10 ? 'text-critical' : 'text-primary'}`}>
                       {crew.avgHandoverMinutes} mins (Std: &ge; 15m)
                     </span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-subtle/40">
                     <span className="text-secondary">Equipment MTBF:</span>
-                    <span className="text-white font-bold">{crew.mtbfHours} hours</span>
+                    <span className="text-primary font-bold">{crew.mtbfHours} hours</span>
                   </div>
                 </div>
               </div>
@@ -257,7 +257,7 @@ export function MaintenanceScreen() {
         <div className="bg-panel border border-subtle rounded-md p-5 space-y-3">
           <div className="flex items-center justify-between border-b border-subtle pb-3">
             <div>
-              <h3 className="font-heading font-bold text-sm text-white tracking-wide flex items-center gap-2">
+              <h3 className="font-heading font-bold text-sm text-primary tracking-wide flex items-center gap-2">
                 <Clock className="h-4 w-4 text-cobalt" />
                 CLOUD SPANNER ISO GQL CALIBRATION &amp; HANDOVER EVENT AUDIT LOG ({liveCalibrations.length} RECORDS)
               </h3>
@@ -288,7 +288,7 @@ export function MaintenanceScreen() {
                   const isSkipped = cal.steps_completed < cal.steps_required;
                   return (
                     <tr key={cal.id || cal.calibration_id || idx} className="hover:bg-raised/40">
-                      <td className="p-2.5 font-bold text-white">{cal.id || cal.calibration_id}</td>
+                      <td className="p-2.5 font-bold text-primary">{cal.id || cal.calibration_id}</td>
                       <td className="p-2.5 text-primary">{cal.machine_id}</td>
                       <td className="p-2.5">
                         <span className={`font-bold ${isSkipped ? 'text-critical' : 'text-healthy'}`}>

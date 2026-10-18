@@ -250,7 +250,7 @@ export function GraphExplorerScreen() {
             <span className="font-mono text-xs text-dim uppercase tracking-wider block">
               AD-HOC KNOWLEDGE GRAPH EXPLORER
             </span>
-            <h2 className="font-heading font-bold text-2xl text-white mt-1">
+            <h2 className="font-heading font-bold text-2xl text-primary mt-1">
               Multi-Hop Topology &amp; Lineage Traversal
             </h2>
           </div>
@@ -280,7 +280,7 @@ export function GraphExplorerScreen() {
               className={`px-2.5 py-1 rounded border transition-colors ${
                 activeEntityId.toUpperCase() === id
                   ? 'bg-active text-white border-active font-bold'
-                  : 'bg-raised border-subtle text-secondary hover:text-white hover:border-strong'
+                  : 'bg-raised border-subtle text-secondary hover:text-primary hover:border-strong'
               }`}
             >
               {id === 'LOT-409' ? 'LOT-409 (Culprit Lot)' : id === 'M02' ? 'M02 (Affected Mill)' : id}
@@ -288,7 +288,7 @@ export function GraphExplorerScreen() {
           ))}
           <button
             onClick={() => loadGraph(activeEntityId)}
-            className="p-1 rounded text-secondary hover:text-white hover:bg-raised ml-auto"
+            className="p-1 rounded text-secondary hover:text-primary hover:bg-raised ml-auto"
             title="Refresh from Spanner"
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-cobalt' : ''}`} />
@@ -304,7 +304,7 @@ export function GraphExplorerScreen() {
               placeholder="Query Spanner node ID (e.g. M12, M02, LOT-409, LOT-377)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-raised border border-subtle rounded pl-9 pr-3 py-2 text-xs text-white placeholder-dim outline-none font-mono focus:border-active"
+              className="w-full bg-raised border border-subtle rounded pl-9 pr-3 py-2 text-xs text-primary placeholder-dim outline-none font-mono focus:border-active"
             />
           </div>
           <button
@@ -325,7 +325,7 @@ export function GraphExplorerScreen() {
               className={`px-2.5 py-1 rounded capitalize transition-colors ${
                 selectedCategory === cat
                   ? 'bg-active text-white font-bold'
-                  : 'bg-raised border border-subtle text-secondary hover:text-white'
+                  : 'bg-raised border border-subtle text-secondary hover:text-primary'
               }`}
             >
               {cat}
@@ -346,21 +346,21 @@ export function GraphExplorerScreen() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-4 bg-panel border border-subtle rounded-md">
           <span className="font-mono text-[10px] text-dim uppercase">SPANNER GRAPH NODE</span>
-          <h4 className="font-heading font-bold text-sm text-white mt-1">Machine</h4>
+          <h4 className="font-heading font-bold text-sm text-primary mt-1">Machine</h4>
           <p className="text-xs text-secondary mt-1 font-sans">
             Properties: <code>machine_id</code>, <code>line_id</code>, <code>install_year</code> &bull; Edges: <code>PROCESSED</code>, <code>CALIBRATED</code>, <code>HAS_SENSOR</code>
           </p>
         </div>
         <div className="p-4 bg-panel border border-subtle rounded-md">
           <span className="font-mono text-[10px] text-dim uppercase">SPANNER GRAPH NODE</span>
-          <h4 className="font-heading font-bold text-sm text-white mt-1">MaterialLot</h4>
+          <h4 className="font-heading font-bold text-sm text-primary mt-1">MaterialLot</h4>
           <p className="text-xs text-secondary mt-1 font-sans">
             Properties: <code>lot_id</code>, <code>material_id</code>, <code>status</code> &bull; Edges: <code>SUPPLIED_BY</code>, <code>HAS_CERT</code>
           </p>
         </div>
         <div className="p-4 bg-panel border border-subtle rounded-md">
           <span className="font-mono text-[10px] text-dim uppercase">SPANNER GRAPH NODE</span>
-          <h4 className="font-heading font-bold text-sm text-white mt-1">Calibration &amp; Handover</h4>
+          <h4 className="font-heading font-bold text-sm text-primary mt-1">Calibration &amp; Handover</h4>
           <p className="text-xs text-secondary mt-1 font-sans">
             Properties: <code>skipped_step</code>, <code>rushed</code>, <code>notes</code> &bull; Edges: <code>DURING_HANDOVER</code>, <code>HANDOVER_FROM</code>
           </p>

@@ -103,7 +103,7 @@ export function PlantFloorMimic({ onSelectStation }: PlantFloorMimicProps) {
       {/* Schematic Header */}
       <div className="p-4 border-b border-subtle flex flex-wrap items-center justify-between gap-3 bg-muted/40">
         <div>
-          <h2 className="font-heading font-bold text-base text-white tracking-wide flex items-center gap-2">
+          <h2 className="font-heading font-bold text-base text-primary tracking-wide flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-healthy animate-ping" />
             LIVE PLANT FLOOR SCHEMATIC (PRODUCTION FLOW MIMIC)
           </h2>
@@ -259,7 +259,7 @@ export function PlantFloorMimic({ onSelectStation }: PlantFloorMimicProps) {
 
                         {/* Hover Quick Diagnostic Tooltip */}
                         {hoveredStation?.id === station.id && (
-                          <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 z-50 w-52 p-2 bg-canvas border border-raised rounded shadow-xl pointer-events-none text-[11px]">
+                          <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 z-50 w-52 p-2.5 bg-panel border border-strong rounded shadow-xl pointer-events-none text-[11px]">
                             <div className="flex items-center justify-between pb-1 border-b border-subtle mb-1">
                               <span className="font-heading font-bold text-primary">{station.name}</span>
                               <span className="font-mono text-[10px] text-dim">{station.id}</span>
@@ -280,7 +280,7 @@ export function PlantFloorMimic({ onSelectStation }: PlantFloorMimicProps) {
                             </div>
                             <div className="mt-1 pt-1 border-t border-subtle text-[9px] text-dim flex justify-between">
                               <span>Tech: {station.lastCalibratedBy}</span>
-                              <span className="text-accent font-semibold">Click for drawer</span>
+                              <span className="text-cobalt font-semibold">Click for drawer</span>
                             </div>
                           </div>
                         )}

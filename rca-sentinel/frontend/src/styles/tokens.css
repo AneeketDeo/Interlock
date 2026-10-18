@@ -1,5 +1,5 @@
 /* ==========================================================================
-   RCA-Sentinel Design System Tokens
+   ThreadTrace Design System Tokens
    Industrial Control Room Aesthetics: Night Shift (Default) & Day Shift
    ========================================================================== */
 
@@ -52,32 +52,120 @@
   --surface-overlay: #FFFFFF;
   --surface-muted: #E2E7ED;
 
-  --border-subtle: #D5DCE4;
-  --border-strong: #A8B5C4;
+  --border-subtle: #CBD5E1;
+  --border-strong: #94A3B8;
   --border-active: #2369E8;
 
-  --text-primary: #121C26;
-  --text-secondary: #4A5B6D;
-  --text-muted: #7E90A3;
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #475569;
   --text-inverse: #FFFFFF;
 
-  --status-healthy: #15986C;
-  --status-healthy-bg: #E3F8F1;
-  --status-healthy-border: #A3E7D1;
+  --status-healthy: #0D9488;
+  --status-healthy-bg: #E6F7F5;
+  --status-healthy-border: #99F6E4;
 
-  --status-caution: #CC7A00;
-  --status-caution-bg: #FFF7E6;
-  --status-caution-border: #FFD480;
+  --status-caution: #B45309;
+  --status-caution-bg: #FEF3C7;
+  --status-caution-border: #FDE68A;
 
-  --status-critical: #D92B0C;
-  --status-critical-bg: #FEECE8;
-  --status-critical-border: #F9A494;
+  --status-critical: #DC2626;
+  --status-critical-bg: #FEE2E2;
+  --status-critical-border: #FECACA;
 
-  --agent-cobalt: #1F6BE8;
-  --agent-cobalt-bg: #EBF3FF;
-  --agent-cobalt-border: #A3C9FF;
+  --agent-cobalt: #2563EB;
+  --agent-cobalt-bg: #EFF6FF;
+  --agent-cobalt-border: #BFDBFE;
 
-  --shadow-overlay: 0 16px 36px rgba(18, 28, 38, 0.12), 0 0 0 1px var(--border-strong);
+  --shadow-overlay: 0 16px 36px rgba(15, 23, 42, 0.12), 0 0 0 1px var(--border-strong);
+}
+
+/* Day Mode High-Legibility Overrides for hardcoded text-white on light surfaces */
+:root[data-theme="day"] .text-white:not(.bg-critical):not(.bg-active):not(.bg-cobalt):not(.bg-healthy):not(.bg-black):not([class*="bg-critical"]):not([class*="bg-active"]):not([class*="bg-cobalt"]):not([class*="bg-black"]):not([class*="bg-red-"]):not([class*="bg-blue-"]) {
+  color: var(--text-primary);
+}
+
+:root[data-theme="day"] .hover\:text-white:hover {
+  color: var(--text-primary);
+}
+
+/* Ensure white text on dark/vibrant solid buttons and badges in Day mode */
+:root[data-theme="day"] .bg-critical,
+:root[data-theme="day"] .bg-critical.text-white,
+:root[data-theme="day"] .bg-critical .text-white,
+:root[data-theme="day"] .bg-active,
+:root[data-theme="day"] .bg-active.text-white,
+:root[data-theme="day"] .bg-active .text-white,
+:root[data-theme="day"] .bg-cobalt,
+:root[data-theme="day"] .bg-cobalt.text-white,
+:root[data-theme="day"] .bg-cobalt .text-white,
+:root[data-theme="day"] .bg-black.text-white,
+:root[data-theme="day"] .bg-black .text-white,
+:root[data-theme="day"] [class*="bg-black"].text-white,
+:root[data-theme="day"] [class*="bg-black"] .text-white,
+:root[data-theme="day"] [class*="bg-red-"].text-white,
+:root[data-theme="day"] [class*="bg-red-"] .text-white,
+:root[data-theme="day"] [class*="bg-blue-"].text-white,
+:root[data-theme="day"] [class*="bg-blue-"] .text-white {
+  color: #FFFFFF !important;
+}
+
+/* Day Mode Caution & Warning Badges: Ensure high-contrast readable text */
+:root[data-theme="day"] .bg-caution {
+  background-color: #F59E0B;
+  color: #0F172A;
+}
+:root[data-theme="day"] .bg-caution.text-black,
+:root[data-theme="day"] .bg-caution .text-black {
+  color: #0F172A !important;
+}
+
+/* Day Mode Healthy / Contained Badges: Crisp white text */
+:root[data-theme="day"] .bg-healthy {
+  background-color: #0D9488;
+  color: #FFFFFF !important;
+}
+:root[data-theme="day"] .bg-healthy.text-black,
+:root[data-theme="day"] .bg-healthy .text-black,
+:root[data-theme="day"] .bg-healthy.text-white,
+:root[data-theme="day"] .bg-healthy .text-white {
+  color: #FFFFFF !important;
+}
+
+/* Day Mode Form Inputs & Interactive Controls */
+:root[data-theme="day"] input,
+:root[data-theme="day"] textarea,
+:root[data-theme="day"] select {
+  color: var(--text-primary);
+}
+:root[data-theme="day"] input::placeholder,
+:root[data-theme="day"] textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Day Mode Table Cell Legibility */
+:root[data-theme="day"] th {
+  color: var(--text-secondary);
+}
+:root[data-theme="day"] td {
+  color: var(--text-primary);
+}
+
+/* React Flow Day Mode Controls & Edges */
+:root[data-theme="day"] .react-flow__controls button {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--border-subtle);
+  fill: var(--text-primary);
+  color: var(--text-primary);
+}
+:root[data-theme="day"] .react-flow__controls button:hover {
+  background-color: var(--surface-raised);
+}
+:root[data-theme="day"] .react-flow__controls svg {
+  fill: var(--text-primary);
+}
+:root[data-theme="day"] .react-flow__edge-text {
+  fill: var(--text-primary);
 }
 
 /* Typography Utility Settings */

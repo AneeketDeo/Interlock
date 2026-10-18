@@ -90,7 +90,7 @@ def create_app() -> FastAPI:
     settings = get_settings()
 
     app = FastAPI(
-        title="RCA-Sentinel API",
+        title="ThreadTrace API",
         description="Agentic knowledge-graph-driven Root Cause Analysis platform (Google Cloud Spanner Graph + Vertex AI)",
         version=settings.app_version,
         lifespan=lifespan,

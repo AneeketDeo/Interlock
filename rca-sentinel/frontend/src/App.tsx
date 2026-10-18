@@ -17,10 +17,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
       <Toaster
-        theme="dark"
         position="bottom-right"
         toastOptions={{
-          className: 'bg-panel border border-strong text-white font-mono text-xs shadow-xl',
+          className: 'bg-panel border border-strong text-primary font-mono text-xs shadow-xl',
         }}
       />
     </QueryClientProvider>

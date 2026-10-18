@@ -46,7 +46,7 @@ export function CommandCenter() {
               <ArrowUpRight className="h-3 w-3 text-healthy" />
             )}
           </div>
-          <div className="font-heading font-bold text-2xl text-white mt-1 tabular-nums">
+          <div className="font-heading font-bold text-2xl text-primary mt-1 tabular-nums">
             {formatPercent(avgYield)}
           </div>
           <span className="text-[10px] text-dim block mt-0.5">
@@ -63,7 +63,7 @@ export function CommandCenter() {
             {isScrapSpike && <AlertTriangle className="h-3 w-3 text-critical animate-pulse" />}
           </div>
           <div className={`font-heading font-bold text-2xl mt-1 tabular-nums ${
-            isScrapSpike ? 'text-critical' : 'text-white'
+            isScrapSpike ? 'text-critical' : 'text-primary'
           }`}>
             {formatPercent(avgScrap)}
           </div>
@@ -76,7 +76,7 @@ export function CommandCenter() {
             <span>PLANT OEE</span>
             <Activity className="h-3 w-3 text-cobalt" />
           </div>
-          <div className="font-heading font-bold text-2xl text-white mt-1 tabular-nums">
+          <div className="font-heading font-bold text-2xl text-primary mt-1 tabular-nums">
             {isScrapSpike ? '81.4%' : '92.6%'}
           </div>
           <span className="text-[10px] text-dim block mt-0.5">Avail: 92% • Perf: 94% • Q: 88%</span>
@@ -88,7 +88,7 @@ export function CommandCenter() {
             <span>THROUGHPUT</span>
             <Layers className="h-3 w-3 text-healthy" />
           </div>
-          <div className="font-heading font-bold text-2xl text-white mt-1 tabular-nums">
+          <div className="font-heading font-bold text-2xl text-primary mt-1 tabular-nums">
             1,045 <span className="text-xs text-secondary font-normal font-sans">ppm</span>
           </div>
           <span className="text-[10px] text-dim block mt-0.5">Plan: 1,135 ppm (-8.0%)</span>
@@ -100,7 +100,7 @@ export function CommandCenter() {
             <span>UNPLANNED DOWNTIME</span>
             <Clock className="h-3 w-3 text-caution" />
           </div>
-          <div className="font-heading font-bold text-2xl text-white mt-1 tabular-nums">
+          <div className="font-heading font-bold text-2xl text-primary mt-1 tabular-nums">
             {isContained ? '0.6 hrs' : '1.8 hrs'}
           </div>
           <span className="text-[10px] text-dim block mt-0.5">Cost: $15.5k / hour</span>
@@ -113,7 +113,7 @@ export function CommandCenter() {
             <TrendingDown className="h-3 w-3 text-critical" />
           </div>
           <div className={`font-heading font-bold text-2xl mt-1 tabular-nums ${
-            isScrapSpike ? 'text-critical' : 'text-white'
+            isScrapSpike ? 'text-critical' : 'text-primary'
           }`}>
             420 <span className="text-xs text-secondary font-normal font-sans">units</span>
           </div>

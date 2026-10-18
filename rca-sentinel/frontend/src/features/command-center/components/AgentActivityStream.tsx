@@ -58,7 +58,7 @@ export function AgentActivityStream() {
     <div className="bg-panel border border-subtle rounded-md p-5 flex flex-col justify-between">
       <div className="border-b border-subtle pb-3 flex items-center justify-between">
         <div>
-          <h3 className="font-heading font-bold text-sm text-white tracking-wide flex items-center gap-2">
+          <h3 className="font-heading font-bold text-sm text-primary tracking-wide flex items-center gap-2">
             <Bot className="h-4 w-4 text-cobalt" />
             LIVE AGENT REASONING STREAM (ADK ORCHESTRATION)
           </h3>

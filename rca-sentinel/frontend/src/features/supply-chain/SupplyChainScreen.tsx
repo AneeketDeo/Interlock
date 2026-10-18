@@ -22,7 +22,7 @@ export function SupplyChainScreen() {
           <span className="font-mono text-xs text-dim uppercase tracking-wider block">
             RAW MATERIAL &amp; SUPPLIER GENEALOGY (CLOUD SPANNER GRAPH)
           </span>
-          <h2 className="font-heading font-bold text-2xl text-white mt-1">
+          <h2 className="font-heading font-bold text-2xl text-primary mt-1">
             Supplier Lot Traceability &amp; Risk Quarantine
           </h2>
           <p className="text-xs text-secondary mt-1 max-w-2xl font-sans">
@@ -33,7 +33,7 @@ export function SupplyChainScreen() {
         {/* Quick Buffer Readiness Badge */}
         <div className="p-3 bg-healthy-bg rounded border border-healthy-border font-mono text-xs text-right">
           <span className="text-healthy text-[10px] block font-bold">VERIFIED BACKUP BATCH</span>
-          <span className="text-white font-bold">{verifiedLot ? `${verifiedLot.id} (${verifiedLot.supplierName})` : 'LOT-377 (Helix Powertrain)'}</span>
+          <span className="text-primary font-bold">{verifiedLot ? `${verifiedLot.id} (${verifiedLot.supplierName})` : 'LOT-377 (Helix Powertrain)'}</span>
           <span className="text-healthy text-[11px] block mt-0.5">Staged at Buffer 03 &bull; Ready</span>
         </div>
       </div>
@@ -41,7 +41,7 @@ export function SupplyChainScreen() {
       {/* ── Lots Table ───────────────────────────────────────────────────────── */}
       <div className="bg-panel border border-subtle rounded-md overflow-hidden">
         <div className="p-4 border-b border-subtle flex items-center justify-between bg-muted/30">
-          <h3 className="font-heading font-bold text-sm text-white flex items-center gap-2">
+          <h3 className="font-heading font-bold text-sm text-primary flex items-center gap-2">
             <Package className="h-4 w-4 text-caution" />
             ACTIVE ALLOY INVENTORY LOTS
           </h3>
@@ -77,7 +77,7 @@ export function SupplyChainScreen() {
                       activeLot?.id === lot.id ? 'bg-raised' : ''
                     }`}
                   >
-                    <td className="p-3 font-bold text-white flex items-center gap-2">
+                    <td className="p-3 font-bold text-primary flex items-center gap-2">
                       <Package className={`h-4 w-4 ${isCulprit ? 'text-critical' : isVerified ? 'text-healthy' : 'text-secondary'}`} />
                       <span>{lot.id}</span>
                     </td>
@@ -132,7 +132,7 @@ export function SupplyChainScreen() {
         <div className="bg-panel border border-subtle rounded-md p-5 space-y-4">
           <div className="border-b border-subtle pb-3">
             <span className="font-mono text-[10px] text-dim uppercase">METALLURGY CERTIFICATE</span>
-            <h4 className="font-heading font-bold text-lg text-white mt-0.5">
+            <h4 className="font-heading font-bold text-lg text-primary mt-0.5">
               Spectrometry Certificate: {activeLot.id}
             </h4>
           </div>
@@ -140,11 +140,11 @@ export function SupplyChainScreen() {
           <div className="space-y-2 text-xs font-mono">
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Vendor Code:</span>
-              <span className="text-white font-bold">{activeLot.vendorCode}</span>
+              <span className="text-primary font-bold">{activeLot.vendorCode}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Material Specification:</span>
-              <span className="text-white">{activeLot.materialType}</span>
+              <span className="text-primary font-semibold">{activeLot.materialType}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Measured Silicon Content:</span>
@@ -154,7 +154,7 @@ export function SupplyChainScreen() {
             </div>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Historical Risk Score:</span>
-              <span className="font-bold text-white">{activeLot.riskScore} / 100</span>
+              <span className="font-bold text-primary">{activeLot.riskScore} / 100</span>
             </div>
           </div>
         </div>
@@ -166,7 +166,7 @@ export function SupplyChainScreen() {
               <ShieldCheck className="h-4 w-4" />
               <span>VERIFIED CLEAN BUFFER ALTERNATIVE</span>
             </div>
-            <h4 className="font-heading font-bold text-lg text-white">
+            <h4 className="font-heading font-bold text-lg text-primary">
               {verifiedLot ? `${verifiedLot.supplierName} Lot ${verifiedLot.id} (Staged at Buffer)` : 'Helix Powertrain Lot LOT-377 (Staged at Buffer)'}
             </h4>
             <p className="text-xs text-secondary mt-1 font-sans leading-relaxed">
@@ -176,7 +176,7 @@ export function SupplyChainScreen() {
 
           <div className="mt-4 pt-3 border-t border-healthy-border/40 flex items-center justify-between text-xs font-mono">
             <span className="text-healthy">Readiness: 100% Staged</span>
-            <span className="text-white font-bold">2,800 kg In Reserve</span>
+            <span className="text-primary font-bold">2,800 kg In Reserve</span>
           </div>
         </div>
       </div>

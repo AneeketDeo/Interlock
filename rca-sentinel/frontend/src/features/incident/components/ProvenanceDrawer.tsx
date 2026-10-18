@@ -18,11 +18,11 @@ export function ProvenanceDrawer({ nodeData, onClose }: ProvenanceDrawerProps) {
             <span className="font-mono text-[10px] text-dim uppercase tracking-wider block">
               EVIDENCE PROVENANCE AUDIT
             </span>
-            <h3 className="font-heading font-bold text-base text-white mt-0.5">{nodeData.label}</h3>
+            <h3 className="font-heading font-bold text-base text-primary mt-0.5">{nodeData.label}</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-secondary hover:text-white hover:bg-raised transition-colors"
+            className="p-1 rounded text-secondary hover:text-primary hover:bg-raised transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -40,16 +40,16 @@ export function ProvenanceDrawer({ nodeData, onClose }: ProvenanceDrawerProps) {
           <div className="p-3 bg-raised/50 rounded border border-subtle space-y-2">
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Source System:</span>
-              <span className="text-white font-bold">{nodeData.sourceSystem || 'Google Cloud Spanner Graph (FactoryGraph)'}</span>
+              <span className="text-primary font-bold">{nodeData.sourceSystem || 'Google Cloud Spanner Graph (FactoryGraph)'}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-subtle/40">
               <span className="text-secondary">Record ID:</span>
-              <span className="text-white font-bold">{nodeData.recordId || 'N/A'}</span>
+              <span className="text-primary font-bold">{nodeData.recordId || 'N/A'}</span>
             </div>
             {nodeData.metric && (
               <div className="flex justify-between py-1 border-b border-subtle/40">
                 <span className="text-secondary">Measured Value:</span>
-                <span className={nodeData.isCulprit ? 'text-critical font-bold' : 'text-white'}>
+                <span className={nodeData.isCulprit ? 'text-critical font-bold' : 'text-primary font-bold'}>
                   {nodeData.metric}
                 </span>
               </div>
@@ -89,7 +89,7 @@ export function ProvenanceDrawer({ nodeData, onClose }: ProvenanceDrawerProps) {
       <div className="p-4 border-t border-subtle bg-panel">
         <button
           onClick={onClose}
-          className="w-full py-2 rounded bg-raised border border-subtle text-secondary hover:text-white text-xs font-mono transition-colors"
+          className="w-full py-2 rounded bg-raised border border-subtle text-secondary hover:text-primary text-xs font-mono transition-colors"
         >
           Close Provenance
         </button>

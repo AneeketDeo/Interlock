@@ -14,7 +14,7 @@ export function FinancialWaterfallPanel() {
       {/* Panel Header */}
       <div className="border-b border-subtle pb-3 flex items-center justify-between">
         <div>
-          <h3 className="font-heading font-bold text-sm text-white tracking-wide flex items-center gap-2">
+          <h3 className="font-heading font-bold text-sm text-primary tracking-wide flex items-center gap-2">
             <DollarSign className="h-4 w-4 text-caution" />
             FINANCIAL EXPOSURE &amp; MITIGATION WATERFALL
           </h3>
@@ -74,19 +74,19 @@ export function FinancialWaterfallPanel() {
       <div className="space-y-2 text-xs font-mono border-t border-subtle pt-3">
         <div className="flex justify-between py-1 border-b border-subtle/40">
           <span className="text-secondary">1. Direct Scrap (420 assemblies @ $200/unit):</span>
-          <span className="text-white font-bold">{formatCurrency(84000)}</span>
+          <span className="text-primary font-bold">{formatCurrency(84000)}</span>
         </div>
         <div className="flex justify-between py-1 border-b border-subtle/40">
           <span className="text-secondary">2. Downstream Tear-Down &amp; Rework:</span>
-          <span className="text-white font-bold">{formatCurrency(42000)}</span>
+          <span className="text-primary font-bold">{formatCurrency(42000)}</span>
         </div>
         <div className="flex justify-between py-1 border-b border-subtle/40">
           <span className="text-secondary">3. Unplanned Line Downtime (2.5 hrs @ $15.5k/hr):</span>
-          <span className="text-white font-bold">{formatCurrency(38800)}</span>
+          <span className="text-primary font-bold">{formatCurrency(38800)}</span>
         </div>
         <div className="flex justify-between py-1 border-b border-subtle/40">
           <span className="text-secondary">4. Customer SLA Delivery Penalties (Order #PO-9912):</span>
-          <span className="text-white font-bold">{formatCurrency(20000)}</span>
+          <span className="text-primary font-bold">{formatCurrency(20000)}</span>
         </div>
         <div className="flex justify-between pt-1 font-bold text-sm">
           <span className="text-healthy">Avoided Exposure Upon Gated Interlock:</span>

@@ -11,6 +11,7 @@ import {
 import { useAppStore } from '../../state/useAppStore';
 import { RcaActionProposal } from '../../mock/fixtures';
 import { formatCurrency } from '../../lib/formatters';
+import { RemediationProcessFlow } from '../incident/components/RemediationProcessFlow';
 
 export function ApprovalGate() {
   const { proposals, approveProposal, rejectProposal, rollbackProposal, role, isDryRun } = useAppStore();
@@ -18,7 +19,7 @@ export function ApprovalGate() {
   const [signingProposal, setSigningProposal] = useState<RcaActionProposal | null>(null);
   const [engineerNotes, setEngineerNotes] = useState('');
 
-  const canApprove = role === 'reliability_engineer' || role === 'quality_engineer';
+  const canApprove = role === 'reliability_engineer' || role === 'quality_engineer' || role === 'plant_manager';
 
   const handleConfirmSignature = () => {
     if (!signingProposal) return;
@@ -37,12 +38,12 @@ export function ApprovalGate() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-heading font-bold text-base text-white tracking-wide">
+              <span className="font-heading font-bold text-base text-primary tracking-wide">
                 MANDATORY HUMAN-IN-THE-LOOP APPROVAL GATE (HITL)
               </span>
               {isDryRun && (
                 <span className="px-2 py-0.2 rounded font-mono text-[10px] bg-caution-bg text-caution border border-caution-border font-bold">
-                  DRY_RUN: SIMULATED EXECUTION
+                  DRY_RUN: PRE-ACTUATION GATE
                 </span>
               )}
             </div>
@@ -68,10 +69,13 @@ export function ApprovalGate() {
         </div>
       </div>
 
+      {/* ── Architecture Remediation Process Flow ───────────────────────────── */}
+      <RemediationProcessFlow />
+
       {/* ── Action Proposal Cards ────────────────────────────────────────────── */}
       <div className="space-y-4">
         <div className="flex items-center justify-between px-1">
-          <h3 className="font-heading font-bold text-base text-white tracking-wide">
+          <h3 className="font-heading font-bold text-base text-primary tracking-wide">
             PROPOSED CONTAINMENT &amp; CORRECTIVE ACTIONS ({proposals.length})
           </h3>
           <span className="text-xs font-mono text-secondary">
@@ -113,7 +117,7 @@ export function ApprovalGate() {
                     >
                       {proposal.type.replace('_', ' ')}
                     </span>
-                    <h4 className="font-heading font-bold text-base text-white">{proposal.title}</h4>
+                    <h4 className="font-heading font-bold text-base text-primary">{proposal.title}</h4>
                   </div>
 
                   <div className="flex items-center gap-3 text-xs font-mono">
@@ -194,7 +198,7 @@ export function ApprovalGate() {
                       <>
                         <button
                           onClick={() => rejectProposal(proposal.id)}
-                          className="px-3 py-1.5 rounded bg-raised border border-subtle text-secondary hover:text-white font-mono transition-colors"
+                          className="px-3 py-1.5 rounded bg-raised border border-subtle text-secondary hover:text-primary font-mono transition-colors"
                         >
                           Reject
                         </button>
@@ -212,7 +216,7 @@ export function ApprovalGate() {
                     {isApproved && (
                       <button
                         onClick={() => rollbackProposal(proposal.id)}
-                        className="px-3 py-1 rounded bg-raised border border-subtle text-secondary hover:text-white font-mono text-xs flex items-center gap-1.5 transition-colors"
+                        className="px-3 py-1 rounded bg-raised border border-subtle text-secondary hover:text-primary font-mono text-xs flex items-center gap-1.5 transition-colors"
                         title="Emergency Rollback"
                       >
                         <RotateCcw className="h-3 w-3" />
@@ -234,13 +238,13 @@ export function ApprovalGate() {
             <div className="flex items-center justify-between border-b border-subtle pb-3">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-critical" />
-                <h3 className="font-heading font-bold text-lg text-white">
+                <h3 className="font-heading font-bold text-lg text-primary">
                   Confirm Engineering Signature
                 </h3>
               </div>
               <button
                 onClick={() => setSigningProposal(null)}
-                className="text-dim hover:text-white font-mono text-xs"
+                className="text-dim hover:text-primary font-mono text-xs"
               >
                 Cancel [Esc]
               </button>
@@ -251,7 +255,7 @@ export function ApprovalGate() {
                 <span className="font-mono text-[10px] text-critical uppercase font-bold block mb-1">
                   ACTION TO EXECUTE ({signingProposal.type.toUpperCase()})
                 </span>
-                <p className="font-semibold text-white">{signingProposal.title}</p>
+                <p className="font-semibold text-primary">{signingProposal.title}</p>
                 <p className="text-secondary text-[11px] mt-1">{signingProposal.description}</p>
               </div>
 
@@ -263,7 +267,7 @@ export function ApprovalGate() {
                   value={engineerNotes}
                   onChange={(e) => setEngineerNotes(e.target.value)}
                   placeholder="e.g., Confirmed Lot #40921 silicon out of spec. Approving immediate feed-hold and buffer lot switchover."
-                  className="w-full bg-raised border border-subtle rounded p-2 text-white font-mono text-xs outline-none focus:border-active h-20"
+                  className="w-full bg-raised border border-subtle rounded p-2 text-primary font-mono text-xs outline-none focus:border-active h-20"
                 />
               </div>
 
@@ -277,7 +281,7 @@ export function ApprovalGate() {
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-subtle">
               <button
                 onClick={() => setSigningProposal(null)}
-                className="px-4 py-2 rounded bg-raised border border-subtle text-secondary hover:text-white font-mono text-xs"
+                className="px-4 py-2 rounded bg-raised border border-subtle text-secondary hover:text-primary font-mono text-xs"
               >
                 Cancel
               </button>

@@ -8,9 +8,7 @@ import {
   Truck,
   Wrench,
   Search,
-  FileText,
   Database,
-  Palette,
   Sun,
   Moon,
   Play,
@@ -99,15 +97,15 @@ export function Shell() {
 
   const navItems = [
     { to: '/', label: 'Command Center', icon: Activity },
-    { to: '/incident', label: 'Incident Case #8921', icon: AlertTriangle, badge: timelineStage >= 1 ? '1' : undefined },
+    { to: '/incident', label: 'Incident Dashboard', icon: AlertTriangle, badge: timelineStage >= 1 ? '1' : undefined },
     { to: '/impact', label: 'Blast Radius & Impact', icon: GitBranch },
     { to: '/approvals', label: 'Approval Gate (HITL)', icon: ShieldCheck, badge: pendingApprovalsCount > 0 ? `${pendingApprovalsCount}` : undefined },
     { to: '/supply-chain', label: 'Supply Chain Lineage', icon: Truck },
     { to: '/maintenance', label: 'Shift & Maintenance', icon: Wrench },
     { to: '/graph', label: 'Graph Explorer', icon: Search },
-    { to: '/report', label: '8D Report (Export)', icon: FileText },
-    { to: '/trust', label: 'Data & Trust Audit', icon: Database },
-    { to: '/design', label: 'Design System', icon: Palette },
+    ...(role === 'plant_manager'
+      ? [{ to: '/trust', label: 'Data & Trust Audit', icon: Database, badge: 'ADMIN' }]
+      : []),
   ];
 
   return (
@@ -118,11 +116,11 @@ export function Shell() {
           {/* Logo / Header */}
           <div className="h-14 flex items-center px-4 border-b border-subtle gap-3 overflow-hidden">
             <div className="h-8 w-8 rounded bg-critical flex items-center justify-center shrink-0 shadow-sm">
-              <span className="font-heading font-bold text-white text-base tracking-tighter">RCA</span>
+              <span className="font-heading font-bold text-white text-base tracking-tighter">TT</span>
             </div>
             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap overflow-hidden">
-              <h1 className="font-heading font-bold text-base tracking-wider uppercase text-white leading-none">
-                Sentinel
+              <h1 className="font-heading font-bold text-base tracking-wider uppercase text-primary leading-none">
+                ThreadTrace
               </h1>
               <p className="text-[10px] text-secondary font-mono tracking-wider mt-0.5">MFG ROOT CAUSE AI</p>
             </div>
@@ -139,7 +137,7 @@ export function Shell() {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2.5 rounded transition-colors relative ${
                       isActive
-                        ? 'bg-raised text-white border-l-2 border-active font-medium'
+                        ? 'bg-raised text-primary border-l-2 border-active font-semibold'
                         : 'text-secondary hover:text-primary hover:bg-raised/50'
                     }`
                   }
@@ -198,7 +196,7 @@ export function Shell() {
               </span>
             )}
 
-            {/* Live Spanner vs Mock Mode indicator/toggle */}
+            {/* Live Spanner vs Standby Cache indicator/toggle */}
             <button
               onClick={toggleDataMode}
               className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-mono font-semibold border transition-colors ${
@@ -206,10 +204,10 @@ export function Shell() {
                   ? 'bg-healthy-bg text-healthy border-healthy-border'
                   : 'bg-raised text-secondary border-subtle'
               }`}
-              title="Click to toggle between Live Spanner and Mock Data"
+              title="Click to toggle between Live Spanner and Standby Cache"
             >
               <Database className="h-3 w-3" />
-              <span>{dataMode === 'live' ? (isSpannerConnected ? 'LIVE SPANNER GRAPH' : 'SPANNER (SYNCING)') : 'MOCK MODE'}</span>
+              <span>{dataMode === 'live' ? (isSpannerConnected ? 'LIVE SPANNER GRAPH' : 'SPANNER (SYNCING)') : 'STANDBY CACHE'}</span>
             </button>
           </div>
 
@@ -288,12 +286,12 @@ export function Shell() {
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono font-medium border transition-colors ${
                 presenterActive
                   ? 'bg-cobalt-bg text-cobalt border-cobalt-border'
-                  : 'bg-raised text-secondary border-subtle hover:text-white'
+                  : 'bg-raised text-secondary border-subtle hover:text-primary'
               }`}
-              title="Presenter Walkthrough Mode [P]"
+              title="Operational Walkthrough Autopilot [P]"
             >
               <Presentation className="h-3.5 w-3.5" />
-              <span>3-MIN DEMO</span>
+              <span>AUTOPILOT</span>
             </button>
 
             {/* Role Switcher */}
@@ -305,13 +303,13 @@ export function Shell() {
               <option value="reliability_engineer">Role: Reliability Eng (Signer)</option>
               <option value="operator">Role: Floor Operator (View Only)</option>
               <option value="quality_engineer">Role: Quality Eng</option>
-              <option value="plant_manager">Role: Plant Manager</option>
+              <option value="plant_manager">Role: Plant Manager (Admin)</option>
             </select>
 
             {/* Day / Night Shift Theme Button */}
             <button
               onClick={toggleTheme}
-              className="p-1.5 rounded bg-raised border border-subtle text-secondary hover:text-white transition-colors"
+              className="p-1.5 rounded bg-raised border border-subtle text-secondary hover:text-primary transition-colors"
               title={`Switch to ${theme === 'night' ? 'Day Shift (Warm Light)' : 'Night Shift (Dark)'} [T]`}
             >
               {theme === 'night' ? <Sun className="h-4 w-4 text-caution" /> : <Moon className="h-4 w-4" />}
@@ -319,12 +317,12 @@ export function Shell() {
           </div>
         </header>
 
-        {/* ── Presenter Mode Walkthrough Banner (When Active) ───────────────────── */}
+        {/* ── Operational Walkthrough Banner (When Active) ───────────────────── */}
         {presenterActive && (
           <div className="bg-cobalt-bg border-b border-cobalt-border px-4 py-2 flex items-center justify-between text-xs animate-in slide-in-from-top-2">
             <div className="flex items-center gap-3">
               <span className="font-mono font-bold text-cobalt uppercase px-1.5 py-0.5 rounded bg-cobalt/20">
-                PRESENTER MODE • STEP {timelineStage + 1}/8
+                SCENARIO AUTOPILOT • STEP {timelineStage + 1}/8
               </span>
               <p className="text-primary font-medium">
                 "{SCENARIO_STEPS[timelineStage]?.talkingPoint}"
@@ -334,7 +332,7 @@ export function Shell() {
               <button
                 onClick={() => scenarioEngine.stepBackward()}
                 disabled={timelineStage === 0}
-                className="px-2 py-1 rounded bg-panel border border-subtle text-secondary hover:text-white disabled:opacity-40"
+                className="px-2 py-1 rounded bg-panel border border-subtle text-secondary hover:text-primary disabled:opacity-40"
               >
                 Previous
               </button>
@@ -347,7 +345,7 @@ export function Shell() {
               </button>
               <button
                 onClick={() => setPresenterActive(false)}
-                className="text-dim hover:text-white ml-2 text-xs"
+                className="text-dim hover:text-primary ml-2 text-xs"
               >
                 Exit
               </button>
@@ -366,45 +364,45 @@ export function Shell() {
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-overlay border border-strong rounded-lg max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-subtle pb-3">
-              <h3 className="font-heading font-bold text-lg text-white">Industrial Console Shortcuts</h3>
-              <button onClick={() => setShortcutsModalOpen(false)} className="text-dim hover:text-white text-sm">
+              <h3 className="font-heading font-bold text-lg text-primary">Industrial Console Shortcuts</h3>
+              <button onClick={() => setShortcutsModalOpen(false)} className="text-dim hover:text-primary text-sm">
                 Esc
               </button>
             </div>
             <div className="space-y-2 text-xs font-mono">
               <div className="flex justify-between py-1 border-b border-subtle/50">
                 <span className="text-secondary">Toggle Day / Night Shift Theme</span>
-                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-white">T</span>
+                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-primary font-semibold">T</span>
               </div>
               <div className="flex justify-between py-1 border-b border-subtle/50">
                 <span className="text-secondary">Toggle 3-Min Presenter Walkthrough</span>
-                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-white">P</span>
+                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-primary font-semibold">P</span>
               </div>
               <div className="flex justify-between py-1 border-b border-subtle/50">
                 <span className="text-secondary">Play / Pause Scenario Timeline</span>
-                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-white">Space</span>
+                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-primary font-semibold">Space</span>
               </div>
               <div className="flex justify-between py-1 border-b border-subtle/50">
                 <span className="text-secondary">Step Forward Scenario</span>
-                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-white">&rarr;</span>
+                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-primary font-semibold">&rarr;</span>
               </div>
               <div className="flex justify-between py-1 border-b border-subtle/50">
                 <span className="text-secondary">Step Backward Scenario</span>
-                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-white">&larr;</span>
+                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-primary font-semibold">&larr;</span>
               </div>
               <div className="flex justify-between py-1 border-b border-subtle/50">
                 <span className="text-secondary">Reset & Run Golden Scenario</span>
-                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-white">G</span>
+                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-primary font-semibold">G</span>
               </div>
               <div className="flex justify-between py-1 border-b border-subtle/50">
                 <span className="text-secondary">Command Palette</span>
-                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-white">Cmd / Ctrl + K</span>
+                <span className="bg-raised px-2 py-0.5 rounded border border-subtle text-primary font-semibold">Cmd / Ctrl + K</span>
               </div>
             </div>
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setShortcutsModalOpen(false)}
-                className="px-4 py-1.5 bg-raised border border-subtle text-white rounded text-xs hover:bg-panel"
+                className="px-4 py-1.5 bg-raised border border-subtle text-primary font-semibold rounded text-xs hover:bg-panel"
               >
                 Close
               </button>

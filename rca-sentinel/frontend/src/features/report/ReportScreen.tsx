@@ -1,7 +1,11 @@
 import { Printer } from 'lucide-react';
 import { useAppStore } from '../../state/useAppStore';
 
-export function ReportScreen() {
+interface ReportScreenProps {
+  onBack?: () => void;
+}
+
+export function ReportScreen({ onBack }: ReportScreenProps = {}) {
   const { activeCase, timelineStage, dataMode } = useAppStore();
 
   const isLive = dataMode === 'live';
@@ -85,7 +89,7 @@ export function ReportScreen() {
           <span className="font-mono text-xs text-dim uppercase tracking-wider block">
             FORMAL 8D PROBLEM SOLVING REPORT
           </span>
-          <h2 className="font-heading font-bold text-2xl text-white mt-1">
+          <h2 className="font-heading font-bold text-2xl text-primary mt-1">
             8D Corrective Action Report &bull; #{activeCase.id}
           </h2>
           <p className="text-xs text-secondary mt-1">
@@ -94,9 +98,17 @@ export function ReportScreen() {
         </div>
 
         <div className="flex items-center gap-3">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="px-3.5 py-2 rounded bg-raised border border-subtle text-primary font-mono text-xs hover:border-strong transition-colors flex items-center gap-1.5"
+            >
+              <span>&larr; Back</span>
+            </button>
+          )}
           <button
             onClick={handlePrint}
-            className="px-3.5 py-2 rounded bg-raised border border-subtle text-white font-mono text-xs hover:border-strong transition-colors flex items-center gap-2"
+            className="px-3.5 py-2 rounded bg-cobalt-bg text-cobalt border border-cobalt-border font-mono text-xs font-bold hover:bg-cobalt/20 transition-colors flex items-center gap-2"
           >
             <Printer className="h-4 w-4" />
             <span>Print / PDF Export</span>
@@ -109,8 +121,8 @@ export function ReportScreen() {
         {/* Document Header */}
         <div className="border-b-2 border-subtle pb-4 flex justify-between items-start print:border-black">
           <div>
-            <h1 className="font-heading font-bold text-2xl text-white print:text-black uppercase">
-              RCA-SENTINEL 8D INVESTIGATION REPORT
+            <h1 className="font-heading font-bold text-2xl text-primary print:text-black uppercase">
+              THREADTRACE 8D INVESTIGATION REPORT
             </h1>
             <p className="font-mono text-xs text-secondary mt-1 print:text-gray-700">
               FACILITY: AUSTIN ADVANCED MANUFACTURING &bull; WORK CENTER: LINE 03 (ST-03B)
@@ -143,7 +155,7 @@ export function ReportScreen() {
                   {s.status.replace('_', ' ')}
                 </span>
               </div>
-              <h3 className="font-heading font-bold text-sm text-white print:text-black mt-0.5">
+              <h3 className="font-heading font-bold text-sm text-primary print:text-black mt-0.5">
                 {s.title}
               </h3>
               <p className="text-xs text-secondary print:text-gray-800 mt-1 font-sans leading-relaxed">
@@ -157,14 +169,14 @@ export function ReportScreen() {
         <div className="pt-6 border-t-2 border-subtle grid grid-cols-2 gap-8 text-xs font-mono print:border-black">
           <div>
             <span className="text-dim block">LEAD RELIABILITY ENGINEER:</span>
-            <div className="mt-4 border-b border-subtle print:border-black pb-1 font-bold text-white print:text-black">
+            <div className="mt-4 border-b border-subtle print:border-black pb-1 font-bold text-primary print:text-black">
               M. Vance, PE (Signed Electronically)
             </div>
             <span className="text-[10px] text-dim">SHA-256: 8f9a2b...c38e &bull; 2024-09-15 22:04 UTC</span>
           </div>
           <div>
             <span className="text-dim block">PLANT QUALITY DIRECTOR:</span>
-            <div className="mt-4 border-b border-subtle print:border-black pb-1 font-bold text-white print:text-black">
+            <div className="mt-4 border-b border-subtle print:border-black pb-1 font-bold text-primary print:text-black">
               J. Martinez (Approved)
             </div>
             <span className="text-[10px] text-dim">Audit Record Verified via FastMCP</span>

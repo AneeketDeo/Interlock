@@ -66,7 +66,7 @@ export function ImpactScreen() {
           <span className="font-mono text-xs text-dim uppercase tracking-wider block">
             FORWARD IMPACT &amp; BLAST RADIUS MODEL
           </span>
-          <h2 className="font-heading font-bold text-2xl text-white mt-1">
+          <h2 className="font-heading font-bold text-2xl text-primary mt-1">
             420 Units at Risk across 3 Customer Delivery Batches
           </h2>
           <p className="text-xs text-secondary mt-1 max-w-3xl font-sans">
@@ -94,7 +94,7 @@ export function ImpactScreen() {
       <div className="bg-panel border border-subtle rounded-md p-5 space-y-4">
         <div className="border-b border-subtle pb-3 flex items-center justify-between">
           <div>
-            <h3 className="font-heading font-bold text-base text-white tracking-wide flex items-center gap-2">
+            <h3 className="font-heading font-bold text-base text-primary tracking-wide flex items-center gap-2">
               <GitBranch className="h-4 w-4 text-cobalt" />
               FORWARD BLAST RADIUS FLOW (SANKEY MULTI-TIER TRACE)
             </h3>
@@ -121,7 +121,7 @@ export function ImpactScreen() {
                     key={item.id}
                     className="p-3 rounded bg-raised border border-subtle text-xs relative group hover:border-strong transition-all shadow-sm"
                   >
-                    <div className="flex items-center justify-between font-heading font-bold text-xs text-white">
+                    <div className="flex items-center justify-between font-heading font-bold text-xs text-primary">
                       <span>{item.name}</span>
                       <span
                         className="h-2 w-2 rounded-full"
@@ -151,7 +151,7 @@ export function ImpactScreen() {
         {/* Waterfall Cost Allocation */}
         <div className="bg-panel border border-subtle rounded-md p-5 flex flex-col justify-between">
           <div className="border-b border-subtle pb-3">
-            <h4 className="font-heading font-bold text-sm text-white flex items-center gap-1.5">
+            <h4 className="font-heading font-bold text-sm text-primary flex items-center gap-1.5">
               <DollarSign className="h-4 w-4 text-caution" />
               FINANCIAL RISK ALLOCATION BREAKDOWN
             </h4>
@@ -164,9 +164,9 @@ export function ImpactScreen() {
             <div>
               <div className="flex justify-between text-secondary mb-1">
                 <span>1. Direct Material Scrap (420 units @ $200):</span>
-                <span className="text-white font-bold">{formatCurrency(84000)} (45.5%)</span>
+                <span className="text-primary font-bold">{formatCurrency(84000)} (45.5%)</span>
               </div>
-              <div className="h-2 w-full bg-raised rounded overflow-hidden">
+              <div className="h-2.5 w-full bg-muted border border-subtle/50 rounded overflow-hidden">
                 <div className="h-full bg-critical" style={{ width: '45.5%' }} />
               </div>
             </div>
@@ -174,9 +174,9 @@ export function ImpactScreen() {
             <div>
               <div className="flex justify-between text-secondary mb-1">
                 <span>2. Downstream Tear-Down &amp; Rework Labor:</span>
-                <span className="text-white font-bold">{formatCurrency(42000)} (22.7%)</span>
+                <span className="text-primary font-bold">{formatCurrency(42000)} (22.7%)</span>
               </div>
-              <div className="h-2 w-full bg-raised rounded overflow-hidden">
+              <div className="h-2.5 w-full bg-muted border border-subtle/50 rounded overflow-hidden">
                 <div className="h-full bg-caution" style={{ width: '22.7%' }} />
               </div>
             </div>
@@ -184,9 +184,9 @@ export function ImpactScreen() {
             <div>
               <div className="flex justify-between text-secondary mb-1">
                 <span>3. Unplanned Line Downtime (2.5h @ $15.5k/hr):</span>
-                <span className="text-white font-bold">{formatCurrency(38800)} (21.0%)</span>
+                <span className="text-primary font-bold">{formatCurrency(38800)} (21.0%)</span>
               </div>
-              <div className="h-2 w-full bg-raised rounded overflow-hidden">
+              <div className="h-2.5 w-full bg-muted border border-subtle/50 rounded overflow-hidden">
                 <div className="h-full bg-caution" style={{ width: '21.0%' }} />
               </div>
             </div>
@@ -194,9 +194,9 @@ export function ImpactScreen() {
             <div>
               <div className="flex justify-between text-secondary mb-1">
                 <span>4. Customer Contract Delivery Penalties:</span>
-                <span className="text-white font-bold">{formatCurrency(20000)} (10.8%)</span>
+                <span className="text-primary font-bold">{formatCurrency(20000)} (10.8%)</span>
               </div>
-              <div className="h-2 w-full bg-raised rounded overflow-hidden">
+              <div className="h-2.5 w-full bg-muted border border-subtle/50 rounded overflow-hidden">
                 <div className="h-full bg-critical" style={{ width: '10.8%' }} />
               </div>
             </div>
@@ -211,7 +211,7 @@ export function ImpactScreen() {
         {/* Graph Criticality Leaderboard */}
         <div className="bg-panel border border-subtle rounded-md p-5 flex flex-col justify-between">
           <div className="border-b border-subtle pb-3">
-            <h4 className="font-heading font-bold text-sm text-white flex items-center gap-1.5">
+            <h4 className="font-heading font-bold text-sm text-primary flex items-center gap-1.5">
               <Building2 className="h-4 w-4 text-cobalt" />
               GRAPH CRITICALITY &amp; CLUSTER EXPOSURE
             </h4>
@@ -224,7 +224,7 @@ export function ImpactScreen() {
             {/* Crew B Criticality */}
             <div className="p-3 rounded bg-raised border border-subtle">
               <div className="flex items-center justify-between font-mono text-[11px] mb-1">
-                <span className="font-bold text-white">MAINTENANCE CREW B (HIGH CENTRALITY)</span>
+                <span className="font-bold text-primary">MAINTENANCE CREW B (HIGH CENTRALITY)</span>
                 <span className="text-critical font-bold">7 OF 9 FAILURES</span>
               </div>
               <p className="text-secondary leading-relaxed font-sans text-xs">
@@ -235,7 +235,7 @@ export function ImpactScreen() {
             {/* AlloyTech Criticality */}
             <div className="p-3 rounded bg-raised border border-subtle">
               <div className="flex items-center justify-between font-mono text-[11px] mb-1">
-                <span className="font-bold text-white">ALLOYTECH GLOBAL (TIER-3 SUPPLIER)</span>
+                <span className="font-bold text-primary">ALLOYTECH GLOBAL (TIER-3 SUPPLIER)</span>
                 <span className="text-caution font-bold">1,200 KG INVENTORY</span>
               </div>
               <p className="text-secondary leading-relaxed font-sans text-xs">

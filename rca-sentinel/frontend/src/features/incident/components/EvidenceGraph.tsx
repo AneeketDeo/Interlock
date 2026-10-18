@@ -22,6 +22,7 @@ import {
   EyeOff,
   Info,
 } from 'lucide-react';
+import { useAppStore } from '../../../state/useAppStore';
 
 export interface GraphNodeData {
   [key: string]: unknown;
@@ -77,7 +78,7 @@ function EvidenceNodeRenderer({ data, selected }: NodeProps<Node<GraphNodeData>>
       </div>
 
       {/* Title */}
-      <div className="font-heading font-bold text-xs text-white leading-tight flex items-center gap-1.5">
+      <div className="font-heading font-bold text-xs text-primary leading-tight flex items-center gap-1.5">
         {data.category === 'machine' && <Cpu className="h-3.5 w-3.5 text-critical shrink-0" />}
         {data.category === 'lot' && <Package className="h-3.5 w-3.5 text-caution shrink-0" />}
         {data.category === 'maintenance' && <Wrench className="h-3.5 w-3.5 text-caution shrink-0" />}
@@ -304,6 +305,7 @@ export function EvidenceGraph({
   customEdges,
   isLoading,
 }: EvidenceGraphProps) {
+  const { theme } = useAppStore();
   const activeNodes = customNodes || propNodes;
   const activeEdges = customEdges || propEdges;
   const [nodes, setNodes] = useState<Node<GraphNodeData>[]>(activeNodes || INITIAL_NODES);
@@ -364,7 +366,7 @@ export function EvidenceGraph({
         <button
           onClick={toggleDimDecoys}
           className={`flex items-center gap-1.5 px-2 py-1 rounded transition-colors ${
-            dimDecoys ? 'bg-raised text-white font-bold' : 'text-secondary hover:text-white'
+            dimDecoys ? 'bg-raised text-primary font-bold' : 'text-secondary hover:text-primary'
           }`}
           title="Dim Decoys [D]"
         >
@@ -376,7 +378,7 @@ export function EvidenceGraph({
 
         <button
           onClick={resetLayout}
-          className="flex items-center gap-1.5 px-2 py-1 rounded text-secondary hover:text-white transition-colors"
+          className="flex items-center gap-1.5 px-2 py-1 rounded text-secondary hover:text-primary transition-colors"
           title="Reset Graph Layout"
         >
           <RotateCcw className="h-3.5 w-3.5" />
@@ -401,8 +403,8 @@ export function EvidenceGraph({
         attributionPosition="bottom-right"
         className="bg-canvas"
       >
-        <Background color="#1C3044" gap={18} size={1} />
-        <Controls className="!bg-panel !border-subtle !text-white fill-white" />
+        <Background color={theme === 'day' ? '#CBD5E1' : '#1C3044'} gap={18} size={1} />
+        <Controls className="!bg-panel !border-subtle !text-primary fill-current" />
       </ReactFlow>
 
       {/* Bottom Graph Banner */}

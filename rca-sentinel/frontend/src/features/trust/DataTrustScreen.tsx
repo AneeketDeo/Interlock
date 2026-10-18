@@ -60,7 +60,7 @@ export function DataTrustScreen() {
           <span className="font-mono text-xs text-dim uppercase tracking-wider block">
             DATA INTEGRITY &amp; TRUST ARCHITECTURE
           </span>
-          <h2 className="font-heading font-bold text-2xl text-white mt-1">
+          <h2 className="font-heading font-bold text-2xl text-primary mt-1">
             Google Cloud Platform Ingestion Health &amp; Audit Trail
           </h2>
           <p className="text-xs text-secondary mt-1 max-w-2xl font-sans">
@@ -71,14 +71,14 @@ export function DataTrustScreen() {
         <div className="flex items-center gap-3">
           <button
             onClick={loadHealth}
-            className="p-2 rounded bg-raised border border-subtle hover:border-active transition-colors text-secondary hover:text-white"
+            className="p-2 rounded bg-raised border border-subtle hover:border-active transition-colors text-secondary hover:text-primary"
             title="Refresh Health Status"
           >
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           </button>
           <div className="p-3 bg-healthy-bg rounded border border-healthy-border text-right font-mono text-xs">
             <span className="text-healthy text-[10px] block font-bold">ONTOLOGY COMPLIANCE</span>
-            <span className="text-white font-bold">100% Spanner Graph</span>
+            <span className="text-primary font-bold">100% Spanner Graph</span>
             <span className="text-healthy text-[11px] block mt-0.5">0 Quarantine Rejects</span>
           </div>
         </div>
@@ -91,7 +91,7 @@ export function DataTrustScreen() {
             <span>SPANNER GRAPH</span>
             <CheckCircle2 className={`h-4 w-4 ${health?.checks?.spanner_graph !== false ? 'text-healthy' : 'text-critical'}`} />
           </div>
-          <div className="font-heading font-bold text-lg text-white mt-1">
+          <div className="font-heading font-bold text-lg text-primary mt-1">
             {health?.checks?.spanner_graph !== false ? 'Connected' : 'Offline'}
           </div>
           <span className="text-[10px] font-mono text-dim block mt-0.5">FactoryGraph &bull; ISO GQL</span>
@@ -102,7 +102,7 @@ export function DataTrustScreen() {
             <span>BIGQUERY HISTORIAN</span>
             <CheckCircle2 className={`h-4 w-4 ${health?.checks?.bigquery !== false ? 'text-healthy' : 'text-critical'}`} />
           </div>
-          <div className="font-heading font-bold text-lg text-white mt-1">
+          <div className="font-heading font-bold text-lg text-primary mt-1">
             {health?.checks?.bigquery !== false ? 'Streaming Active' : 'Offline'}
           </div>
           <span className="text-[10px] font-mono text-dim block mt-0.5">rca_historian.ObservationWindow</span>
@@ -113,7 +113,7 @@ export function DataTrustScreen() {
             <span>CLOUD PUB/SUB</span>
             <CheckCircle2 className={`h-4 w-4 ${health?.checks?.pubsub !== false ? 'text-healthy' : 'text-critical'}`} />
           </div>
-          <div className="font-heading font-bold text-lg text-white mt-1">
+          <div className="font-heading font-bold text-lg text-primary mt-1">
             {health?.checks?.pubsub !== false ? 'Listening' : 'Offline'}
           </div>
           <span className="text-[10px] font-mono text-dim block mt-0.5">telemetry-anomaly-sub &bull; 0 lag</span>
@@ -124,7 +124,7 @@ export function DataTrustScreen() {
             <span>FASTMCP SERVER</span>
             <CheckCircle2 className="h-4 w-4 text-healthy" />
           </div>
-          <div className="font-heading font-bold text-lg text-white mt-1">Active (:8001)</div>
+          <div className="font-heading font-bold text-lg text-primary mt-1">Active (:8001)</div>
           <span className="text-[10px] font-mono text-dim block mt-0.5">10 Tools &bull; 3 Resources</span>
         </div>
       </div>
@@ -132,7 +132,7 @@ export function DataTrustScreen() {
       {/* ── Immutable Audit Log ──────────────────────────────────────────────── */}
       <div className="bg-panel border border-subtle rounded-md overflow-hidden">
         <div className="p-4 border-b border-subtle flex items-center justify-between bg-muted/30">
-          <h3 className="font-heading font-bold text-sm text-white flex items-center gap-2">
+          <h3 className="font-heading font-bold text-sm text-primary flex items-center gap-2">
             <Key className="h-4 w-4 text-cobalt" />
             IMMUTABLE ACTUATION &amp; INFERENCE AUDIT TRAIL
           </h3>
@@ -149,7 +149,7 @@ export function DataTrustScreen() {
                 <span className="px-2 py-0.5 rounded bg-raised text-primary text-[11px] font-bold">
                   {ev.action}
                 </span>
-                <span className="text-white font-sans text-xs">{ev.actor}</span>
+                <span className="text-primary font-sans text-xs">{ev.actor}</span>
                 <span className="text-dim">on</span>
                 <span className="text-secondary font-bold">{ev.entity}</span>
               </div>
